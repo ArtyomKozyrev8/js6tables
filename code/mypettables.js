@@ -58,7 +58,7 @@ class MyFilteredSortedTable {
         let _searchBox = document.createElement("input");
         _searchBox.setAttribute("class", table_styles["searchbox"]);
         _searchBox.style.marginBottom = "10px";
-        _searchBox.setAttribute("placeholder", "Введите часть слова, которое ищете ...");
+        _searchBox.setAttribute("placeholder", "Print part of the word, you are searching for ...");
         return _searchBox
     }
 
