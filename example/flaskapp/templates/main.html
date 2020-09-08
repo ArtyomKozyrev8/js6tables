@@ -34,10 +34,11 @@
     <h3>Updatable Paginated Table</h3>
     <div id="upd_page_table"></div>
     <script>
-        const tableStyles = new TableStyle("form-control", "btn btn-outline-success", "", "table table-hover",
-            "" , "", "loader")
 
-        fetch('/random/8/6')
+        const tableStyles = new TableStyle("form-control", "btn btn-outline-success",
+            "btn btn-outline-success", "table table-hover", "" , "", "loader")
+        // create first table:
+        fetch('/random/10/6')
             .then(response => response.json())
             .then(data => {
                 let t_headings = ["A", "B", "C", "D", "E", "F"];
@@ -47,6 +48,24 @@
                     t_headings,
                     data,
                     t_types,
+                    true,
+                    tableStyles
+                );
+                t.create_filtered_sorted_table();
+            });
+        // create second table
+        fetch('/random/9/7')
+            .then(response => response.json())
+            .then(data => {
+                let t_headings = ["A", "B", "C", "D", "E", "F", "G"];
+                let t_types = new Array(t_headings.length).fill("num");
+                let t = new MyFilterSortUpdTable(
+                    "upd_ord_table",
+                    t_headings,
+                    data,
+                    t_types,
+                    "/random/9/7",
+                    15,
                     true,
                     tableStyles
                 );
