@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tables Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+          crossorigin="anonymous">
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3; /* Light grey */
+            border-top: 16px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin-left: 40%;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script src="{{ url_for('static', filename='mypettables2.js')}}"></script>
+</head>
+<body>
+    <h3>Ordinary Table</h3>
+    <div id="ord_table"></div>
+    <h3>Updatable Ordinary Table</h3>
+    <div id="upd_ord_table"></div>
+    <h3>Paginated Table</h3>
+    <div id="page_table"></div>
+    <h3>Updatable Paginated Table</h3>
+    <div id="upd_page_table"></div>
+    <script>
+        const tableStyles = new TableStyle("form-control", "btn btn-outline-success", "", "table table-hover",
+            "" , "", "loader")
+
+        fetch('/random/8/6')
+            .then(response => response.json())
+            .then(data => {
+                let t_headings = ["A", "B", "C", "D", "E", "F"];
+                let t_types = new Array(t_headings.length).fill("num");
+                let t = new MyFilteredSortedTable(
+                    "ord_table",
+                    t_headings,
+                    data,
+                    t_types,
+                    true,
+                    tableStyles
+                );
+                t.create_filtered_sorted_table();
+            });
+    </script>
+</body>
+</html>
