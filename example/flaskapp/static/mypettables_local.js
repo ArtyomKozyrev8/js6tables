@@ -140,20 +140,28 @@ class MyFilteredSortedTable {
         return myTable
     }
 
-    static _sortItemsFunc(index, _type, order) {
+    static _sortItemsFunc(index, _type, order, pure_array) {
         /**
          * wrapper for inner function to provide additional args
          * index - number of item in Array (column number in Table)
          * _type can be "num" or "str"
          * order - descending or ascending sort order
+         * pure_array - boolean flag - indicates if we sort pure Array or rows from Table
          */
         function inner(a, b) {
             /**
              * is used in sort JS function, logic is made according to rules of the sort JS
              * a, b - are some rows in the Table
              */
-            let valueA = a.getElementsByTagName("td").item(index).innerText;
-            let valueB = b.getElementsByTagName("td").item(index).innerText;
+            let valueA = "";
+            let valueB = "";
+            if (pure_array) {
+                valueA = a[index];
+                valueB = b[index];
+            } else {
+                valueA = a.getElementsByTagName("td").item(index).innerText;
+                valueB = b.getElementsByTagName("td").item(index).innerText;
+            }
             if (_type === "num") {
                 valueA = Number(valueA);
                 valueB = Number(valueB);
@@ -170,11 +178,12 @@ class MyFilteredSortedTable {
         return inner
     }
 
-    static _sortTableArray(index, _type) {
+    static _sortTableArray(index, _type, pure_array) {
         /**
          * wrapper Closure for innerFunc to provide additional arguments and keep state with _order variable
          * index - column number in the table
          * _type - can be "num" or "str" - type of the column
+         * pure_array - boolean flag - indicates if we sort pure Array or rows from Table
          */
         let _order = 1; // asc or desc sort order
         function innerFunc(array) {
@@ -182,7 +191,7 @@ class MyFilteredSortedTable {
              * sorts elements of Array and returns a new Array
              * array - some Array created from Table element
              */
-            let f = MyFilteredSortedTable._sortItemsFunc(index, _type, _order);
+            let f = MyFilteredSortedTable._sortItemsFunc(index, _type, _order, pure_array);
             _order *= -1;
             return Array.from(array.sort((a, b) => f(a, b)))
         }
@@ -311,7 +320,7 @@ class MyFilteredSortedTable {
 
         // add event handler to column headers
         for (let index=0; index<tableHead.children[0].childElementCount; index++) {
-            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index]);
+            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index], false);
             tableHead.children[0].children[index].addEventListener("click", ()=>{
                 MyFilteredSortedTable._sortTable(this.myTable, this.loadSpinner, sortFunc);
             });
@@ -437,7 +446,7 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
 
         // add event handler to column headers
         for (let index=0; index<tableHead.children[0].childElementCount; index++) {
-            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index]);
+            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index], false);
             tableHead.children[0].children[index].addEventListener("click", ()=>{
                 MyFilteredSortedTable._sortTable(this.myTable, this.loadSpinner, sortFunc);
             });
