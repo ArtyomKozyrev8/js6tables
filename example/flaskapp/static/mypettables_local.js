@@ -36,7 +36,7 @@ class MyFilteredSortedTable {
      * @param column_types - could be "num" for Number or "str" for all other column data types
      * column_types is used to perform correct sort of table based on elements types
      * @param clear_div - true or false. If you want to clear div before inserting table use true, otherwise - false
-     * @param table_styles - object which contains table styles, to get idea of the properties see _defaultStyle
+     * @param table_styles - TableStyle instance which contains table styles
      */
 
     {
@@ -326,30 +326,31 @@ class MyFilteredSortedTable {
     }
 }
 
-class MyFilterSortUpdTable extends MyFilteredSortedTable {
-    constructor(
-        div_id,
-        table_headings,
-        rows_data,
-        column_types,
-        url,
-        update_interval,
-        clear_div = true, // indicates if we want to clear div when we create table
-        table_styles = {
-            "searchbox": "", // is input text html element style - css class name
-            "csvbtn": "",  // is button html element style - css class name
-            "updatesbtn": "", // is button html element style - css class name
-            "table": "", // style for table - css class name
-            "tbody": "", // table body style - css class name
-            "thead": "",  // table head style - css class name
-            "spinner": "" // loading spinner style - css class name
-        }) {
-        MyFilterSortUpdTable._checkConstructorInputDataFilterSortUpd(url, update_interval, table_styles);
+class MyFilterSortUpdTable extends MyFilteredSortedTable
+{
+    constructor(div_id, table_headings, rows_data, column_types, url, update_interval=10,
+                clear_div = true, table_styles=new TableStyle())
+    /**
+     * The basic table type with scheduled updates of table info.
+     * Updates can be stopped with the help of the certain button or if you put some data in the searchbox.
+     * The table have element search, columns can be sorted, you can get .csv file from the table
+     * @param div_id - div container where table will be inserted
+     * @param table_headings - heading of table columns - Array
+     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Tble Row data
+     * @param column_types - could be "num" for Number or "str" for all other column data types
+     * @param url - backend endpoint, which provide scheduled updates for the table
+     * @param update_interval - interval in seconds. Updates frequency.
+     * @param clear_div - true or false. If you want to clear div before inserting table use true, otherwise - false
+     * @param table_styles - TableStyle instance which contains table styles
+     */
+    {
+        MyFilterSortUpdTable._checkConstructorInputDataFilterSortUpd(url, update_interval);
         super(div_id, table_headings, rows_data, column_types, clear_div, table_styles);
-        this.url = url; // url of http server page to get update for table body
-        this.update_interval = update_interval; // how often we would like to update table body
-        this.do_updates = true ; // flag whether table should be updated
+        this.url = url;
+        this.update_interval = update_interval;
+        this.do_updates = true ; // flag whether table should be updated, the flag is attached to button
         this.btnUpd = MyFilterSortUpdTable._createStopResUpdBtn(this.table_styles);
+        // table body is recreated after each update. Searchbox is used as condition flag.
         setInterval(
             () => { MyFilterSortUpdTable._updateTableBody(this.myTable, this.searchBox, this.loadSpinner, this.url) },
             this.update_interval * 1000
@@ -361,12 +362,16 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable {
         btn.innerText = "Не Обновлять";
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "5px";
-        btn.setAttribute("class", table_styles["updatesbtn"]);
+        btn.setAttribute("class", String(table_styles.updatesbtn));
         return btn
     }
 
-    static _stopPeriodicUpdates(e) {
-        if (typeof this.do_updates === "undefined") { this.do_updates = true }; // otherwise can  cause problem
+    static _stopPeriodicUpdates(e)
+    /**
+     * Change value of DO_UPDATES flag to the opposite, it is attachen to Stop/Renew Updates Btn
+     */
+    {
+        if (typeof this.do_updates === "undefined") { this.do_updates = true }; // otherwise can cause problem
         if (this.do_updates) {
             this.do_updates = false;
             e.target.innerText = "Обновлять";
@@ -374,24 +379,28 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable {
             this.do_updates = true;
             e.target.innerText = "Не Обновлять";
         }
+        e.preventDefault();
     }
 
-    static _checkConstructorInputDataFilterSortUpd(url, update_interval, table_styles) {
-        if (typeof update_interval !== "number") {throw "update_interval should be number"};
-        if (update_interval <= 0) {throw "update_interval should be number"};
-        if (typeof url !== "string") {throw "update_interval should be number"};
-        if (!(typeof table_styles  === 'object')) { throw "table_styles should be object type" };
-        if (!(table_styles.hasOwnProperty("updatesbtn")))
-        {
-            throw 'table_styles should have the following structure: {' +
-            '"searchbox": "class name or empty string",' +
-            ' "csvbtn": "", "table": "", "tbody": "", "thead": "", "updatesbtn": ""}';
-        }
+    static _checkConstructorInputDataFilterSortUpd(url, update_interval) {
+        if (typeof update_interval !== "number") {throw new Error("update_interval should be number")};
+        if (update_interval <= 0) {throw new Error("update_interval should be number")};
+        if (typeof url !== "string") {throw new Error("update_interval should be number")};
     }
 
-    static _updateTableBody(table, searchBox, spinner, url) {
+    static _updateTableBody(table, searchBox, spinner, url)
+    /**
+     * Created new table body with the data received from backend endpoint.
+     * searchBox is used as condition. Spinner changes its style
+     * @param table - the Table element
+     * @param searchBox - the input element
+     * @param spinner - the spinner element
+     * @param url - url to get updates
+     * @private
+     */
+    {
         if (typeof this.do_updates === "undefined") { this.do_updates = true}; // otherwise can  cause problem
-        if (searchBox.value === "" & this.do_updates) {
+        if (searchBox.value === "" && this.do_updates) {
             spinner.style.display = "";
             table.children[1].style.display = "none"
             fetch(url, {method: 'GET',})
@@ -412,11 +421,10 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable {
                     table.children[1].style.display = "";
                 })
                 .catch((error) => { console.log(error); })
-        } else {};
+        } else {};  // do nothing = pass
     }
 
     create_filtered_sorted_table() {
-        // the methods insert our table in the chosen div container
         let divContainer = document.getElementById(this.div_id);
         if (this.clear_div) {divContainer.innerText = "";};
 
@@ -429,16 +437,16 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable {
 
         // add event handler to column headers
         for (let index=0; index<tableHead.children[0].childElementCount; index++) {
-            let sort = new TableColumnSort();
+            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index]);
             tableHead.children[0].children[index].addEventListener("click", ()=>{
-                sort.sortMyFilteredSortedTableColumn(this.myTable, this.loadSpinner, index, this.column_types[index]);
+                MyFilteredSortedTable._sortTable(this.myTable, this.loadSpinner, sortFunc);
             });
         }
 
         this.btnCSV.addEventListener("click", () => { MyFilterSortUpdTable._exportCSV(this.myTable); });
         this.btnUpd.addEventListener("click", (e) => { MyFilterSortUpdTable._stopPeriodicUpdates(e); });
         divContainer.appendChild(this.btnCSV);
-        divContainer.appendChild(this.btnUpd);
+        divContainer.appendChild(this.btnUpd); // new element here in comparison with Basic Table
         divContainer.appendChild(this.searchBox);
         divContainer.appendChild(this.myTable);
         divContainer.appendChild(this.loadSpinner);
