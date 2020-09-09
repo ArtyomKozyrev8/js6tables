@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Tables Page</title>
+    <!-- Below is dependency fo Paginated Tables (Bootsrap 4) -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
           crossorigin="anonymous">
@@ -15,6 +16,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
             crossorigin="anonymous"></script>
+    <!-- End of dependencies block -->
+
+    <!-- You can define any styles instead of styles in the block below -->
     <style>
         th {
             cursor: pointer;
@@ -34,6 +38,9 @@
             100% { transform: rotate(360deg); }
         }
     </style>
+    <!-- End of block -->
+
+    <!-- mypettables Script should be imported after Bootstrap 4 scripts -->
     <script src="{{ url_for('static', filename='mypettables_local.js')}}"></script>
 </head>
 <body>
@@ -45,25 +52,29 @@
     <div id="page_table"></div>
     <h3>Updatable Paginated Table</h3>
     <div id="upd_page_table"></div>
-    <script>
 
+    <!-- Script which create tables with the help of classed from mypettables can be defined in the end of body container
+     or it can be defined as a separate js script file and then it can be declared in head block, NOTE it should be
+     declared after mypettables.js
+     -->
+    <script>
         const tableStyles = new TableStyle("form-control", "btn btn-outline-success",
-            "btn btn-outline-success", "table table-hover", "" , "", "loader")
+            "btn btn-outline-success", "table table-hover", "" , "", "loader") // this a classes names for elements
         // create first table:
         fetch('/random/10/6')
             .then(response => response.json())
             .then(data => {
                 let t_headings = ["A", "B", "C", "D", "E", "F"];
-                let t_types = new Array(t_headings.length).fill("num");
+                let t_types = new Array(t_headings.length).fill("num"); // num or str
                 let t = new MyFilteredSortedTable(
-                    "ord_table",
-                    t_headings,
-                    data,
-                    t_types,
-                    true,
+                    "ord_table", // div where we would like to see our table
+                    t_headings, // column headings Array
+                    data, // Array of Arrays, inner Array should have the same length as t_headings
+                    t_types, // types of columns data (number or string)
+                    true, // do we want to clear div before inserting table
                     tableStyles
                 );
-                t.create_filtered_sorted_table();
+                t.createPetTable();
             });
         // create second table
         fetch('/random/9/7')
@@ -72,16 +83,16 @@
                 let t_headings = ["A", "B", "C", "D", "E", "F", "G"];
                 let t_types = new Array(t_headings.length).fill("num");
                 let t = new MyFilterSortUpdTable(
-                    "upd_ord_table",
-                    t_headings,
-                    data,
-                    t_types,
-                    "/random/9/7",
-                    15,
-                    true,
+                    "upd_ord_table", // div where we would like to see our table
+                    t_headings, // column headings Array
+                    data, // Array of Arrays, inner Array should have the same length as t_headings
+                    t_types, // types of columns data (number or string)
+                    "/random/9/7", // endpoint of our API to get updates for our table
+                    15, // we would like to get updates every 15 seconds
+                    true, // do we want to clear div before inserting table
                     tableStyles
                 );
-                t.create_filtered_sorted_table();
+                t.createPetTable();
             });
         // create third table
         fetch('/paged/75/5')
@@ -90,13 +101,13 @@
                 let t_headings = ["A", "B", "C", "D", "E"];
                 let t_types = new Array(t_headings.length).fill("num");
                 let t = new PagedTable(
-                    "page_table",
-                    t_headings,
-                    data,
-                    t_types,
+                    "page_table", // div where we would like to see our table
+                    t_headings, // column headings Array
+                    data, // Array of Arrays, inner Array should have the same length as t_headings
+                    t_types, // types of columns data (number or string)
                     tableStyles
                 );
-                t.create_filtered_sorted_table();
+                t.createPetTable();
             });
     </script>
 </body>

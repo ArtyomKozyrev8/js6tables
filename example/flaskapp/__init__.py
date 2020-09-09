@@ -7,14 +7,27 @@ def create_app():
 
     @app.route("/", methods=["GET"])
     def main():
+        """Provide base template for the website"""
         return render_template("main.html")
 
     @app.route("/random/<int:rows>/<int:items>", methods=["GET"])
     def generate_random_array(rows=0, items=0):
+        """
+        Provide data for tables
+        :param rows: number of rows in the table
+        :param items: number of columns in the table
+        :return: list of lists
+        """
         return jsonify([[randint(0, 200) for j in range(items)] for i in range(rows)])
 
     @app.route("/paged/<int:rows>/<int:items>", methods=["GET"])
     def generate_array_for_paginated_table(rows=0, items=0):
+        """
+        Provide data for tables
+        :param rows: number of rows in the table
+        :param items: number of columns in the table
+        :return: list of lists
+        """
         table_rows = []
         for i in range(rows):
             row_items = []
