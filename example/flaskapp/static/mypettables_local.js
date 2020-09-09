@@ -462,36 +462,43 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
     }
 }
 
-class PagedTable extends MyFilteredSortedTable {
-    constructor(
-        div_id,
-        table_headings,
-        rows_data,
-        column_types,
-        clear_div = true, // indicates if we want to clear div when we create table
-        table_styles = {
-            "searchbox": "", // is input text html element style - css class name
-            "csvbtn": "",  // is button html element style - css class name
-            "table": "", // style for table - css class name
-            "tbody": "", // table body style - css class name
-            "thead": "",  // table head style - css class name
-            "spinner": "" // loading spinner style - css class name
-        }) {
-        //MyFilterSortUpdTable._checkConstructorInputDataFilterSortUpd(url, update_interval, table_styles);
+class PagedTable extends MyFilteredSortedTable
+{
+    constructor(div_id, table_headings, rows_data, column_types,
+                clear_div = true, table_styles = new TableStyle())
+    /**
+     * Table which provide paginated presentation of data. Has the same features as Basic table:
+     * to get table as .csv file, to search through table, to sort table.
+     * To use standard styles of the Table, you have to use Bootstrap, since styles of some elements are predefined
+     * @param div_id - div container where table will be inserted
+     * @param table_headings - heading of table columns - Array
+     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Tble Row data
+     * Len of table_headings should be = Len of rows_data
+     * @param column_types - could be "num" for Number or "str" for all other column data types
+     * column_types is used to perform correct sort of table based on elements types
+     * @param clear_div - true or false. If you want to clear div before inserting table use true, otherwise - false
+     * @param table_styles - TableStyle instance which contains table styles
+     */
+    {
         super(div_id, table_headings, rows_data, column_types, clear_div, table_styles);
-        //this.numberSelector = PagedTable._createNumberSelector();
-        this.tableRows = rows_data;
+        this.tableRows = rows_data; // is used since we do not display all table, but need to make sort and search on all elements
+        // the block is used to define initial look (Next, Prev buttons) of paginator element
         if (this.tableRows.length > 0) {
             this.curPage = 1;
         } else {
             this.curPage = 0;
         }
-        this.visibleTable = PagedTable._createPagedTableVisible(this.table_headings, this.tableRows, this.table_styles);
-        this.pagination = PagedTable._createPaginator(this.table_headings, this.btnCSV, this.myTable, this.div_id, this.tableRows, this.curPage, 10, this.table_styles);
-        this.searchBox = PagedTable._createSearchBox(this.table_headings, this.btnCSV, this.myTable, this.div_id, this.tableRows, this.curPage, 10, this.table_styles);
-        this.dropItems = PagedTable._createItemNumberBtn(this.table_headings, this.btnCSV, this.myTable, this.div_id, this.tableRows, this.curPage, 10, this.table_styles);
-        this.itemNumberBtn = this.dropItems[0]
-        this.itemMenu = this.dropItems[1]
+        this.visibleTable = PagedTable._createPagedTableVisible(
+            this.table_headings, this.tableRows, this.table_styles);
+
+        this.pagination = PagedTable._createPaginator(this.table_headings, this.btnCSV, this.myTable, this.div_id,
+            this.tableRows, this.curPage, 10, this.table_styles);
+
+        this.searchBox = PagedTable._createSearchBox(this.table_headings, this.btnCSV, this.myTable, this.div_id,
+            this.tableRows, this.curPage, 10, this.table_styles);
+
+        [this.itemNumberBtn, this.itemMenu] = PagedTable._createItemNumberBtn(this.table_headings, this.btnCSV,
+            this.myTable, this.div_id, this.tableRows, this.curPage, 10, this.table_styles);
     }
 
     static _createItemNumberBtn(table_headings, btnCSV, table, div_id, rows_data, cur_page, items_page, table_styles) {
@@ -504,7 +511,7 @@ class PagedTable extends MyFilteredSortedTable {
         btn.style.marginLeft = "3px";
         let dropDownMenuContainer = document.createElement("div");
         dropDownMenuContainer.setAttribute("class", "dropdown-menu");
-        let values = [5, 10, 15, 20, 25, 30, 50, 75, 100, 125, 150];
+        let values = [5, 10, 15, 20, 25, 30, 50, 75, 100];
         for (let i of values) {
             let _link = document.createElement("a");
             _link.innerText = String(i);
@@ -536,9 +543,11 @@ class PagedTable extends MyFilteredSortedTable {
                 btn.setAttribute("items_per_page", e.target.innerText)
                 tableBody = PagedTable._fillTableBody(tableBody, activeTableRows, cur_page, items_page);
                 tableHead = PagedTable._fillTableHead(tableHead, table_headings);
-                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, activeTableRows, cur_page, items_page, table_styles);
+                let navItem = PagedTable._createPaginator(
+                    table_headings, btnCSV, table, div_id, activeTableRows, cur_page, items_page, table_styles);
                 // search should be done over all elements so rows_data is used
-                let newSearchBox = PagedTable._createSearchBox(table_headings, btnCSV, table, div_id, rows_data, cur_page, items_page, table_styles);
+                let newSearchBox = PagedTable._createSearchBox(
+                    table_headings, btnCSV, table, div_id, rows_data, cur_page, items_page, table_styles);
                 newSearchBox.value = searchBox.value;
                 table.appendChild(tableHead);
                 table.appendChild(tableBody);
@@ -561,7 +570,7 @@ class PagedTable extends MyFilteredSortedTable {
     static _createSearchBox(table_headings, btnCSV, table, div_id, rows_data, cur_page, items_page, table_styles) {
         // hide rows of the table based on value of searchBox
         let _searchBox = document.createElement("input");
-        _searchBox.setAttribute("class", table_styles["searchbox"]);
+        _searchBox.setAttribute("class", String(table_styles.searchbox));
         _searchBox.style.marginBottom = "3px";
         _searchBox.setAttribute("placeholder", "Пожалуйста введите часть слова, которое ищете ...");
         let tableBody = table.getElementsByTagName("tbody").item(0);
@@ -586,11 +595,13 @@ class PagedTable extends MyFilteredSortedTable {
             let cur_page = 1;
             if (activeTableRows.length === 0) { cur_page = 0}
             let container = document.getElementById(div_id);
-            let items_page = Number(container.getElementsByTagName("button").item(1).getAttribute("items_per_page"));
+            let items_page = Number(container.getElementsByTagName("button").item(
+                1).getAttribute("items_per_page"));
             tableBody = PagedTable._fillTableBody(tableBody, activeTableRows, cur_page, items_page);
             tableHead = PagedTable._fillTableHead(tableHead, table_headings);
 
-            let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, activeTableRows, cur_page, items_page, table_styles);
+            let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, activeTableRows,
+                cur_page, items_page, table_styles);
             table.appendChild(tableHead);
             table.appendChild(tableBody);
             container.removeChild(container.lastChild);
@@ -700,7 +711,8 @@ class PagedTable extends MyFilteredSortedTable {
             last_link.addEventListener("click", (e) => {
                 tableBody = PagedTable._fillTableBody(tableBody, rows_data, cur_page - 1, items_page);
                 tableHead = PagedTable._fillTableHead(tableHead, table_headings);
-                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, rows_data, cur_page - 1, items_page, table_styles);
+                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, rows_data,
+                    cur_page - 1, items_page, table_styles);
                 table.appendChild(tableHead);
                 table.appendChild(tableBody);
                 let container = document.getElementById(div_id)
@@ -729,7 +741,8 @@ class PagedTable extends MyFilteredSortedTable {
             _link.addEventListener("click", (e) => {
                 tableBody = PagedTable._fillTableBody(tableBody, rows_data, Number(_link.innerText), items_page);
                 tableHead = PagedTable._fillTableHead(tableHead, table_headings);
-                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, rows_data, Number(_link.innerText), items_page, table_styles);
+                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id,
+                    rows_data, Number(_link.innerText), items_page, table_styles);
                 table.appendChild(tableHead);
                 table.appendChild(tableBody);
                 let container = document.getElementById(div_id);
@@ -757,7 +770,8 @@ class PagedTable extends MyFilteredSortedTable {
             next_link.addEventListener("click", () => {
                 tableBody = PagedTable._fillTableBody(tableBody, rows_data, cur_page + 1, items_page);
                 tableHead = PagedTable._fillTableHead(tableHead, table_headings);
-                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, rows_data, cur_page + 1, items_page, table_styles);
+                let navItem = PagedTable._createPaginator(table_headings, btnCSV, table, div_id, rows_data,
+                    cur_page + 1, items_page, table_styles);
                 table.appendChild(tableHead);
                 table.appendChild(tableBody);
                 let container = document.getElementById(div_id);
@@ -773,34 +787,6 @@ class PagedTable extends MyFilteredSortedTable {
 
         navItem.appendChild(uList);
         return navItem
-    }
-
-    static  _sortArray(_array, column_type, index, sort_order=true) {
-        for (let i = 0; i < _array.length; i++) {
-            for (let j = 0; j < _array.length; j++) {
-                let cellI = _array[i];
-                let cellJ = _array[j];
-                // convert to correct type to make correct column sorting:
-                if (column_type === "num") {
-                    cellI = Number(cellI);
-                    cellJ = Number(cellJ);
-                }
-                if (sort_order) {
-                    if (cellI > cellJ) {
-                        let c = _array[i];
-                        _array[i] = _array[j];
-                        _array[j] = c;
-                    }
-                } else {
-                    if (cellI < cellJ) {
-                        let c = _array[i];
-                        _array[i] = _array[j];
-                        _array[j] = c;
-                    }
-                }
-            }
-        }
-        return _array
     }
 
     static _fillTableHead(tableHead, table_headings) {
@@ -820,15 +806,15 @@ class PagedTable extends MyFilteredSortedTable {
 
     static _createPagedTableVisible(_table_headings, _rows_data, table_styles) {
         let myTable = document.createElement("table");
-        myTable.setAttribute("class", table_styles["table"]);
+        myTable.setAttribute("class", String(table_styles.table));
         let tableHead = document.createElement("thead");
         tableHead = PagedTable._fillTableHead(tableHead, _table_headings);
-        tableHead.setAttribute("class", table_styles["thead"]);
+        tableHead.setAttribute("class", String(table_styles.thead));
         myTable.appendChild(tableHead);
 
         // create table body block
         let tableBody = document.createElement("tbody");
-        tableBody.setAttribute("class", table_styles["tbody"]);
+        tableBody.setAttribute("class", String(table_styles.tbody));
         let cur_page = 0
         if (_rows_data.length>0) {cur_page = 1};
         tableBody = PagedTable._fillTableBody(tableBody, _rows_data, cur_page, 10)
