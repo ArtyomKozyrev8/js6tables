@@ -13,5 +13,19 @@ def create_app():
     def generate_random_array(rows=0, items=0):
         return jsonify([[randint(0, 200) for j in range(items)] for i in range(rows)])
 
-    return app
+    @app.route("/paged/<int:rows>/<int:items>", methods=["GET"])
+    def generate_array_for_paginated_table(rows=0, items=0):
+        table_rows = []
+        for i in range(rows):
+            row_items = []
+            if i // 4 == 0:
+                row_items = [999] * items
+            elif i // 7 == 0:
+                row_items = [1998] * items
+            else:
+                for j in range(items):
+                    row_items.append(j + i)
+            table_rows.append(row_items)
+        return jsonify(table_rows)
 
+    return app
