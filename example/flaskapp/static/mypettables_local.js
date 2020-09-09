@@ -227,7 +227,7 @@ class MyFilteredSortedTable {
     /**
      * Makes Browser to take data from webpage table element (inside the div) and return .csv file
      * including hidden elements!
-     * @param table - the tabble element inside the div
+     * @param table - the table element inside the div
      * @private
      */
     {
@@ -303,7 +303,7 @@ class MyFilteredSortedTable {
         }
     }
 
-    create_filtered_sorted_table()
+    createPetTable()
     /**
      * creates all elements of the Table and put them inside the chosen div
      */
@@ -377,7 +377,7 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
 
     static _stopPeriodicUpdates(e)
     /**
-     * Change value of DO_UPDATES flag to the opposite, it is attachen to Stop/Renew Updates Btn
+     * Change value of DO_UPDATES flag to the opposite, it is attached to Stop/Renew Updates Btn
      */
     {
         if (typeof this.do_updates === "undefined") { this.do_updates = true }; // otherwise can cause problem
@@ -433,7 +433,7 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
         } else {};  // do nothing = pass
     }
 
-    create_filtered_sorted_table() {
+    createPetTable() {
         let divContainer = document.getElementById(this.div_id);
         if (this.clear_div) {divContainer.innerText = "";};
 
@@ -453,7 +453,9 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
         }
 
         this.btnCSV.addEventListener("click", () => { MyFilterSortUpdTable._exportCSV(this.myTable); });
-        this.btnUpd.addEventListener("click", (e) => { MyFilterSortUpdTable._stopPeriodicUpdates(e); });
+        this.btnUpd.addEventListener("click", (e) => {
+            MyFilterSortUpdTable._stopPeriodicUpdates(e);
+        });
         divContainer.appendChild(this.btnCSV);
         divContainer.appendChild(this.btnUpd); // new element here in comparison with Basic Table
         divContainer.appendChild(this.searchBox);
@@ -502,7 +504,9 @@ class PagedTable extends MyFilteredSortedTable
             this.div_id, this.tableRows, this.curPage, 10, this.table_styles, this.column_types);
     }
 
-    static _createItemNumberBtn(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types) {
+    static _createItemNumberBtn(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types)
+    /** Created Button and Item List to choose number of items we want to see on one table page */
+    {
         let container = document.getElementById(div_id);
         let table = container.getElementsByTagName("table").item(0);
         let btn = document.createElement("button");
@@ -525,20 +529,7 @@ class PagedTable extends MyFilteredSortedTable
 
             _link.addEventListener("click", (e) => {
                 let searchBox = container.getElementsByTagName("input").item(0);
-                let activeTableRows = []
-                for (let i=0; i<rows_data.length; i++) {
-                    let found = false;
-                    for (let j=0; j<rows_data[i].length; j++) {
-                        if (String(rows_data[i][j]).toLowerCase().includes(
-                            searchBox.value.toLowerCase())) {
-                            found = true;
-                            break
-                        }
-                    }
-                    if (found) {
-                        activeTableRows.push(rows_data[i])
-                    }
-                }
+                let activeTableRows = PagedTable._findActiveTableRows(rows_data, searchBox.value)
                 let cur_page = 1;
                 if (activeTableRows.length === 0) { cur_page = 0 }
 
@@ -582,7 +573,6 @@ class PagedTable extends MyFilteredSortedTable
         _searchBox.style.marginBottom = "3px";
         _searchBox.setAttribute("placeholder", "Пожалуйста введите часть слова, которое ищете ...");
         let tableBody = table.getElementsByTagName("tbody").item(0);
-        let tableHead = table.getElementsByTagName("thead").item(0);
 
         _searchBox.addEventListener("keyup", (e) => {
             let activeTableRows = []
@@ -640,7 +630,18 @@ class PagedTable extends MyFilteredSortedTable
         MyFilteredSortedTable._triggerDownload(tableHTMLURL, "table_utf8_encoding.csv");
     }
 
-    static _findVisiblePageNumbers(cur, page_to_show_num, total) {
+    static _findVisiblePageNumbers(cur, page_to_show_num, total)
+    /**
+     * In paginator block we would like to see only a number of pages dues to limited browser webpage size.
+     * The function helps to define visible page numbers.
+     * @param cur - active page number
+     * @param page_to_show_num - how many page numbers we would like to see
+     * @param total - total number of the pages
+     * @returns {[]|*[]}
+     * @private
+     */
+    {
+
         if (cur === 0) {
             return []
         }
@@ -679,7 +680,6 @@ class PagedTable extends MyFilteredSortedTable
         let table = container.getElementsByTagName("table").item(0);
         const totalPageNumber = Math.ceil(rows_data.length/items_page);
         let tableBody = table.getElementsByTagName("tbody").item(0);
-        let tableHead = table.getElementsByTagName("thead").item(0);
 
         let navItem = document.createElement("nav");
         navItem.setAttribute("aria-label", "pagination");
@@ -775,7 +775,38 @@ class PagedTable extends MyFilteredSortedTable
         return navItem
     }
 
-    static _createTableHead(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types) {
+    static _findActiveTableRows(rows_data, searchBoxValue)
+    /**
+     * When elements of the page were filtered by searchBox, we provide other elements, like Paginator
+     * only with the subset of initial table items. It is done to provide correct display of filtered
+     * table data
+     * @param rows_data - Array of arrays - table body data
+     * @param searchBoxValue - current value of searchBox (Text to make filtering)
+     * @returns {[]}
+     * @private
+     */
+    {
+        let activeTableRows = []
+        for (let i=0; i<rows_data.length; i++) {
+            let found = false;
+            for (let j=0; j<rows_data[i].length; j++) {
+                if (String(rows_data[i][j]).toLowerCase().includes(
+                    searchBoxValue.toLowerCase())) {
+                    found = true;
+                    break
+                }
+            }
+            if (found) {
+                activeTableRows.push(rows_data[i])
+            }
+        }
+        return activeTableRows
+    }
+
+    static _createTableHead(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types)
+    /** Table Head is created separately for PagedTable, since it acts independently from Table Body
+     * and do not change so ofter due to events in other table elements, like SearchBox and Paginator */
+    {
         let container = document.getElementById(div_id);
         let tableHead = document.createElement("thead");
         tableHead.setAttribute("class", String(table_styles.thead));
@@ -789,20 +820,7 @@ class PagedTable extends MyFilteredSortedTable
                 table.removeChild(table.lastChild); // remove table body
                 rows_data = sortFunc(rows_data);
                 let searchBox = container.getElementsByTagName("input").item(0);
-                let activeTableRows = []
-                for (let i=0; i<rows_data.length; i++) {
-                    let found = false;
-                    for (let j=0; j<rows_data[i].length; j++) {
-                        if (String(rows_data[i][j]).toLowerCase().includes(
-                            searchBox.value.toLowerCase())) {
-                            found = true;
-                            break
-                        }
-                    }
-                    if (found) {
-                        activeTableRows.push(rows_data[i])
-                    }
-                }
+                let activeTableRows = PagedTable._findActiveTableRows(rows_data, searchBox.value)
                 let cur_page = 1;
                 if (activeTableRows.length === 0) { cur_page = 0 }
                 let tableBody = PagedTable._createTableBody(activeTableRows, cur_page, items_page, table_styles);
@@ -860,11 +878,13 @@ class PagedTable extends MyFilteredSortedTable
         container.appendChild(myTable);
     }
 
-    create_filtered_sorted_table() {
+    createPetTable() {
         let divContainer = document.getElementById(this.div_id);
         let table = divContainer.getElementsByTagName("table").item(0);
         divContainer.innerText = "";
-        this.btnCSV.addEventListener("click", () => { PagedTable._exportCSV(this.table_headings, this.tableRows); });
+        this.btnCSV.addEventListener("click", () => {
+            PagedTable._exportCSV(this.table_headings, this.tableRows);
+        });
         divContainer.appendChild(this.btnCSV);
         divContainer.appendChild(this.itemNumberBtn);
         divContainer.appendChild(this.itemMenu);
