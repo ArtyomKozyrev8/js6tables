@@ -473,7 +473,7 @@ class PagedTable extends MyFilteredSortedTable
      * To use standard styles of the Table, you have to use Bootstrap, since styles of some elements are predefined
      * @param div_id - div container where table will be inserted
      * @param table_headings - heading of table columns - Array
-     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Tble Row data
+     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Table Row data
      * Len of table_headings should be = Len of rows_data
      * @param column_types - could be "num" for Number or "str" for all other column data types
      * column_types is used to perform correct sort of table based on elements types
@@ -492,7 +492,7 @@ class PagedTable extends MyFilteredSortedTable
         document.getElementById(this.div_id).innerText = "";
         // adds table to the div in order to let other functions to use it during initial construction
         PagedTable._createInitialTable(this.table_headings, this.div_id, this.tableRows,
-            this.table_styles, this.column_types);
+            this.table_styles, this.column_types, 10);
 
         this.pagination = PagedTable._createPaginator(this.table_headings, this.div_id,
             this.tableRows, this.curPage, 10, this.table_styles, this.column_types);
@@ -512,7 +512,7 @@ class PagedTable extends MyFilteredSortedTable
         let btn = document.createElement("button");
         btn.setAttribute("class", "btn btn-outline-success dropdown-toggle");
         btn.setAttribute("data-toggle", "dropdown");
-        btn.setAttribute("items_per_page", "10");
+        btn.setAttribute("items_per_page", String(items_page));
         btn.innerText = "Элементов на странице";
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "3px";
@@ -660,7 +660,7 @@ class PagedTable extends MyFilteredSortedTable
             temp_cur -= 1;
             pages_to_show_array.push(temp_cur);
         }
-        pages_to_show_array.sort();
+        pages_to_show_array.sort((a, b) => Number(a) - Number(b));
         pages_to_show_array.push(cur);
         temp_cur = cur + 1;
         right_pages_number += left_pages_number;
@@ -861,21 +861,22 @@ class PagedTable extends MyFilteredSortedTable
         return tableBody
     }
 
-    static _createInitialTable(_table_headings, div_id, _rows_data, table_styles, column_types) {
+    static _createInitialTable(_table_headings, div_id, _rows_data, table_styles, column_types, items_page) {
         let myTable = document.createElement("table");
         myTable.setAttribute("class", String(table_styles.table));
         let cur_page = 0;
         if (_rows_data.length>0) {cur_page = 1};
 
         let tableHead = PagedTable._createTableHead(_table_headings, div_id, _rows_data,
-            cur_page, 10, table_styles, column_types);
+            cur_page, items_page, table_styles, column_types);
         myTable.appendChild(tableHead);
 
-        let tableBody = PagedTable._createTableBody(_rows_data, cur_page, 10, table_styles);
+        let tableBody = PagedTable._createTableBody(_rows_data, cur_page, items_page, table_styles);
         myTable.appendChild(tableBody);
         let container = document.getElementById(div_id);
 
         container.appendChild(myTable);
+        return myTable
     }
 
     createPetTable() {
@@ -888,6 +889,136 @@ class PagedTable extends MyFilteredSortedTable
         divContainer.appendChild(this.btnCSV);
         divContainer.appendChild(this.itemNumberBtn);
         divContainer.appendChild(this.itemMenu);
+        divContainer.appendChild(this.searchBox);
+        divContainer.appendChild(table);
+        divContainer.appendChild(this.pagination);
+    }
+}
+
+
+class PagedUpdTable extends PagedTable
+{
+    constructor(div_id, table_headings, rows_data, column_types, url, update_interval=10,
+                table_styles = new TableStyle())
+    /**
+     * The Paged Table with periodic data Updates.
+     * @param div_id - div container where table will be inserted
+     * @param table_headings - heading of table columns - Array
+     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Table Row data
+     * @param column_types - could be "num" for Number or "str" for all other column data types
+     * @param url - backend endpoint, which provide scheduled updates for the table
+     * @param update_interval - interval in seconds. Updates frequency.
+     * @param table_styles - TableStyle instance which contains table styles
+     */
+    {
+        super(div_id, table_headings, rows_data, column_types, table_styles);
+        PagedUpdTable._checkConstructorInputDataPagedUpd(url, update_interval);
+        this.url = url;
+        this.update_interval = update_interval;
+        this.btnUpd = PagedUpdTable._createStopUpdBtn(this.table_styles);
+        // table body is recreated after each update. Searchbox is used as condition flag.
+        setInterval(
+            () => { PagedUpdTable._updateWholeTable(this.table_headings, this.div_id,
+                this.table_styles, this.column_types, this.url)},
+            this.update_interval * 1000
+        );
+    }
+
+    static _updateWholeTable(table_headings, div_id, table_styles, column_types, url)
+    /**
+     * When new update for table data is received, we actually recreate all table elements except
+     * button which can switch on/off new updates. If Searchbox is not empty, new updates are also
+     * ignored.
+     * @param table_headings - heading of the table are always the same
+     * @param div_id - container for our table - div element with the certain id
+     * @param table_styles - styles of table elements - same
+     * @param column_types - data types of column elements
+     * @param url - we receive update from this url endpoint
+     * @private
+     */
+    {
+        let container = document.getElementById(div_id);
+        let updBtn = container.getElementsByTagName("button").item(2);
+        let itemNumberBtn = container.getElementsByTagName("button").item(1);
+        let searchBox = container.getElementsByTagName("input").item(0);
+        if (searchBox.value === "" && updBtn.getAttribute("do_updates") === "1") {
+            let items_page = itemNumberBtn.getAttribute("items_per_page");
+            if (items_page) {
+                items_page = Number(items_page);
+            } else {
+                items_page = 10;
+            };
+            fetch(url, {method: 'GET',})
+                .then(response => response.json())
+                .then(data => {
+                    let cur_page = 1;
+                    if (data.length === 0) { cur_page = 0 }
+                    container.innerHTML = "";
+                    let newTable = PagedUpdTable._createInitialTable(table_headings, div_id, data,
+                        table_styles, column_types, items_page);
+                    let newSearchBox = PagedUpdTable._createSearchBox(table_headings, div_id, data,
+                        cur_page, items_page, table_styles, column_types);
+                    let newPaginator = PagedUpdTable._createPaginator(table_headings, div_id, data,
+                        cur_page, items_page, table_styles, column_types);
+                    let [newItemNumBtn, itemMenu]  = PagedUpdTable._createItemNumberBtn(table_headings, div_id, data,
+                        cur_page, items_page, table_styles, column_types);
+                    let  newCSVBtn= PagedUpdTable._createDownloadCSVBtn(table_styles);
+                    newCSVBtn.addEventListener("click", () => {
+                        PagedTable._exportCSV(table_headings, data);
+                    });
+                    let contparts = [newCSVBtn, newItemNumBtn, itemMenu, updBtn, newSearchBox, newTable, newPaginator];
+                    for (let i of contparts) { container.appendChild(i); }
+                })
+                .catch((error) => { console.log(error); })
+        } else {};  // do nothing = pass
+    }
+
+    static _createStopUpdBtn(table_styles) {
+        let btn = document.createElement("button");
+        btn.setAttribute("do_updates", "1");
+        btn.innerText = "Не Обновлять";
+        btn.style.marginBottom = "3px";
+        btn.style.marginLeft = "5px";
+        btn.style.marginRight = "5px";
+        btn.setAttribute("class", String(table_styles.updatesbtn));
+        return btn
+    }
+
+    static _stopPeriodicUpdates(e)
+    /**
+     * Change value of DO_UPDATES flag to the opposite, it is attached to Stop/Renew Updates Btn
+     */
+    {
+        if (e.target.getAttribute("do_updates") === "0") {
+            e.target.setAttribute("do_updates", "1");
+            e.target.innerText = "Не Обновлять";
+        } else {
+            e.target.setAttribute("do_updates", "0");
+            e.target.innerText = "Обновлять";
+        }
+        e.preventDefault();
+    }
+
+    static _checkConstructorInputDataPagedUpd(url, update_interval) {
+        if (typeof update_interval !== "number") {throw new Error("update_interval should be number")};
+        if (update_interval <= 0) {throw new Error("update_interval should be number")};
+        if (typeof url !== "string") {throw new Error("update_interval should be number")};
+    }
+
+    createPetTable() {
+        let divContainer = document.getElementById(this.div_id);
+        let table = divContainer.getElementsByTagName("table").item(0);
+        divContainer.innerText = "";
+        this.btnCSV.addEventListener("click", () => {
+            PagedTable._exportCSV(this.table_headings, this.tableRows);
+        });
+        this.btnUpd.addEventListener("click", (e) => {
+            PagedUpdTable._stopPeriodicUpdates(e);
+        });
+        divContainer.appendChild(this.btnCSV);
+        divContainer.appendChild(this.itemNumberBtn);
+        divContainer.appendChild(this.itemMenu);
+        divContainer.appendChild(this.btnUpd); // new element added
         divContainer.appendChild(this.searchBox);
         divContainer.appendChild(table);
         divContainer.appendChild(this.pagination);
