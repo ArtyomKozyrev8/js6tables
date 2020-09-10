@@ -109,6 +109,24 @@
                 );
                 t.createPetTable();
             });
+        // create fourth table
+        fetch('/paged_upd/75/5')
+            .then(response => response.json())
+            .then(data => {
+                let t_headings = ["A", "B", "C", "D", "E"];
+                let t_types = new Array(t_headings.length).fill("num");
+                let t = new PagedUpdTable(
+                    "upd_page_table", // div where we would like to see our table
+                    t_headings, // column headings Array
+                    data, // Array of Arrays, inner Array should have the same length as t_headings
+                    t_types, // types of columns data (number or string)
+                    '/paged_upd/75/5', // url to get updates
+                    5, // updates interval in seconds
+                    tableStyles
+                );
+                t.createPetTable();
+            });
+
     </script>
 </body>
 </html>
