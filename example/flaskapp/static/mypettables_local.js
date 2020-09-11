@@ -5,7 +5,7 @@ class TableStyle {
      * Describe Appearance of Table
      * @param searchbox - is input text html element style - css class name
      * @param csvbtn - is csv button html element style - css class name
-     * @param updatesbtn - is updatesbtn button html element style - css class name - Used in Updatable Tables
+     * @param updatesbtn - is button html element style - css class name - Used in Updatable Tables
      * @param table - style for table - css class name
      * @param tbody - table body style - css class name
      * @param thead - table head style - css class name
@@ -18,7 +18,7 @@ class TableStyle {
         this.table = table;
         this.tbody = tbody;
         this.thead = thead;
-        this.spinner = spinner
+        this.spinner = spinner;
     }
 }
 
@@ -31,7 +31,7 @@ class MyFilteredSortedTable {
      * You can customize table elements style and table spinner style
      * @param div_id - div container where table will be inserted
      * @param table_headings - heading of table columns - Array
-     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Tble Row data
+     * @param rows_data - data of tables rows - Array of Arrays, where inner Array is Table Row data
      * Len of table_headings should be = Len of rows_data
      * @param column_types - could be "num" for Number or "str" for all other column data types
      * column_types is used to perform correct sort of table based on elements types
@@ -40,7 +40,8 @@ class MyFilteredSortedTable {
      */
 
     {
-        MyFilteredSortedTable._checkConstructorInputData(table_headings, rows_data, column_types, table_styles, clear_div);
+        MyFilteredSortedTable._checkConstructorInputData(table_headings, rows_data, column_types,
+            table_styles, clear_div);
         this.div_id = div_id;
         this.table_headings = table_headings;
         this.rows_data = rows_data;
@@ -54,6 +55,15 @@ class MyFilteredSortedTable {
     }
 
     static _checkConstructorInputData(table_headings, rows_data, column_types, table_styles, clear_div)
+    /**
+     * checks data to create Table
+     * @param table_headings - array of string, should be equal to rows_data length
+     * @param rows_data - array of arrays, length of array should be equal to table_headings length
+     * @param column_types - array of strings (str or num), it's length should be equal to table_headings length
+     * @param table_styles - instance of TableStyle class
+     * @param clear_div - true of false, indicates whether div container should be cleared before table creation
+     * @private
+     */
     {
         if (!Array.isArray(table_headings)) { throw new Error("table_headings should be Array"); };
         if (!Array.isArray(rows_data)) { throw new Error("rows_data should be Array"); };
@@ -83,14 +93,28 @@ class MyFilteredSortedTable {
         }
     }
 
-    static _createSpinner(table_styles) {
+    static _createSpinner(table_styles)
+    /**
+     * Creates loader element which is used for the table inside container
+     * @param table_styles - instance of TableStyle class
+     * @returns {HTMLDivElement}
+     * @private
+     */
+    {
         let spinnerDiv = document.createElement("div");
         spinnerDiv.setAttribute("class", String(table_styles.spinner));
         spinnerDiv.style.display = "none";
         return spinnerDiv
     }
 
-    static _createSearchBox(table_styles) {
+    static _createSearchBox(table_styles)
+    /**
+     * Creates searchbox element which is used for the table inside container
+     * @param table_styles - instance of TableStyle class
+     * @returns {HTMLInputElement}
+     * @private
+     */
+    {
         let _searchBox = document.createElement("input");
         _searchBox.setAttribute("class", String(table_styles.searchbox));
         _searchBox.style.marginBottom = "3px";
@@ -98,7 +122,14 @@ class MyFilteredSortedTable {
         return _searchBox
     }
 
-    static _createDownloadCSVBtn(table_styles) {
+    static _createDownloadCSVBtn(table_styles)
+    /**
+     * creates button element to download table as a csv file
+     * @param table_styles - instance of TableStyle class
+     * @returns {HTMLButtonElement}
+     * @private
+     */
+    {
         let btn = document.createElement("button");
         btn.innerText = "CSV";
         btn.style.marginBottom = "3px";
@@ -106,7 +137,16 @@ class MyFilteredSortedTable {
         return btn
     }
 
-    static _createTable(_table_headings, _rows_data, table_styles) {
+    static _createTable(_table_headings, _rows_data, table_styles)
+    /**
+     * Creates table element with thead and tbody
+     * @param table_headings - array of string, should be equal to rows_data length
+     * @param rows_data - array of arrays, length of array should be equal to table_headings length
+     * @param table_styles - instance of TableStyle class
+     * @returns {HTMLTableElement}
+     * @private
+     */
+    {
         let myTable = document.createElement("table");
         myTable.setAttribute("class", String(table_styles.table));
 
@@ -361,13 +401,22 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
         this.btnUpd = MyFilterSortUpdTable._createStopResUpdBtn(this.table_styles);
         // table body is recreated after each update. Searchbox is used as condition flag.
         setInterval(
-            () => { MyFilterSortUpdTable._updateTableBody(this.myTable, this.searchBox, this.loadSpinner, this.url) },
+            () => { MyFilterSortUpdTable._updateTableBody(this.btnUpd, this.myTable,
+                this.searchBox, this.loadSpinner, this.url) },
             this.update_interval * 1000
         );
     }
 
-    static _createStopResUpdBtn(table_styles) {
+    static _createStopResUpdBtn(table_styles)
+    /**
+     * creates button which can switch on/off updates
+     * @param table_styles - instance of TableStyle class
+     * @returns {HTMLButtonElement}
+     * @private
+     */
+    {
         let btn = document.createElement("button");
+        btn.setAttribute("do_updates", "1");
         btn.innerText = "Не Обновлять";
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "5px";
@@ -380,27 +429,34 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
      * Change value of DO_UPDATES flag to the opposite, it is attached to Stop/Renew Updates Btn
      */
     {
-        if (typeof this.do_updates === "undefined") { this.do_updates = true }; // otherwise can cause problem
-        if (this.do_updates) {
-            this.do_updates = false;
-            e.target.innerText = "Обновлять";
-        } else {
-            this.do_updates = true;
+        if (e.target.getAttribute("do_updates") === "0") {
+            e.target.setAttribute("do_updates", "1");
             e.target.innerText = "Не Обновлять";
+        } else {
+            e.target.setAttribute("do_updates", "0");
+            e.target.innerText = "Обновлять";
         }
         e.preventDefault();
     }
 
-    static _checkConstructorInputDataFilterSortUpd(url, update_interval) {
+    static _checkConstructorInputDataFilterSortUpd(url, update_interval)
+    /**
+     * Check user input variable before creating the table class instance
+     * @param url - to get updates from the certain API endpoint
+     * @param update_interval - number of seconds between updates - positive integer
+     * @private
+     */
+    {
         if (typeof update_interval !== "number") {throw new Error("update_interval should be number")};
         if (update_interval <= 0) {throw new Error("update_interval should be number")};
         if (typeof url !== "string") {throw new Error("update_interval should be number")};
     }
 
-    static _updateTableBody(table, searchBox, spinner, url)
+    static _updateTableBody(updBtn, table, searchBox, spinner, url)
     /**
      * Created new table body with the data received from backend endpoint.
      * searchBox is used as condition. Spinner changes its style
+     * @param updBtn - the switch on/of updates button element
      * @param table - the Table element
      * @param searchBox - the input element
      * @param spinner - the spinner element
@@ -408,8 +464,7 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
      * @private
      */
     {
-        if (typeof this.do_updates === "undefined") { this.do_updates = true}; // otherwise can  cause problem
-        if (searchBox.value === "" && this.do_updates) {
+        if (searchBox.value === "" && updBtn.getAttribute("do_updates") === "1") {
             spinner.style.display = "";
             table.children[1].style.display = "none"
             fetch(url, {method: 'GET',})
@@ -433,7 +488,11 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
         } else {};  // do nothing = pass
     }
 
-    createPetTable() {
+    createPetTable()
+    /**
+     * Adds our table to the desired div container
+     */
+    {
         let divContainer = document.getElementById(this.div_id);
         if (this.clear_div) {divContainer.innerText = "";};
 
@@ -505,7 +564,20 @@ class PagedTable extends MyFilteredSortedTable
     }
 
     static _createItemNumberBtn(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types)
-    /** Created Button and Item List to choose number of items we want to see on one table page */
+    /**
+     * Creates button (actually button + ulist with choices) which allows to choose number of elements per page.
+     * Pay attention that several _createElementName functions in the Class have the same args list, it is done
+     * because these elements recreate themselves and sometimes other elements of the table.
+     * @param table_headings - array of column names
+     * @param div_id - container for the table
+     * @param rows_data - array of arrays, inner arrays length should be equal to table headings length
+     * @param cur_page - current active page of the table number
+     * @param items_page - how many rows per page to display
+     * @param table_styles - instace of TableStyle
+     * @param column_types - array which contains types of columns data, array length equal to table_headings length
+     * @returns {(HTMLButtonElement|HTMLDivElement)[]}
+     * @private
+     */
     {
         let container = document.getElementById(div_id);
         let table = container.getElementsByTagName("table").item(0);
@@ -513,7 +585,7 @@ class PagedTable extends MyFilteredSortedTable
         btn.setAttribute("class", "btn btn-outline-success dropdown-toggle");
         btn.setAttribute("data-toggle", "dropdown");
         btn.setAttribute("items_per_page", String(items_page));
-        btn.innerText = "Элементов на странице";
+        btn.innerText = `Элементов: ${items_page}`;
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "3px";
         let dropDownMenuContainer = document.createElement("div");
@@ -564,8 +636,22 @@ class PagedTable extends MyFilteredSortedTable
         return [btn, dropDownMenuContainer]
     }
 
-    static _createSearchBox(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types) {
-        // hide rows of the table based on value of searchBox
+    static _createSearchBox(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types)
+    /**
+     * Creates searchbox (input element) which allows to filter table rows to display.
+     * Pay attention that several _createElementName functions in the Class have the same args list, it is done
+     * because these elements recreate themselves and sometimes other elements of the table.
+     * @param table_headings - array of column names
+     * @param div_id - container for the table
+     * @param rows_data - array of arrays, inner arrays length should be equal to table headings length
+     * @param cur_page - current active page of the table number
+     * @param items_page - how many rows per page to display
+     * @param table_styles - instace of TableStyle
+     * @param column_types - array which contains types of columns data, array length equal to table_headings length
+     * @returns {(HTMLButtonElement|HTMLDivElement)[]}
+     * @private
+     */
+    {
         let container = document.getElementById(div_id);
         let table = container.getElementsByTagName("table").item(0);
         let _searchBox = document.createElement("input");
@@ -610,7 +696,14 @@ class PagedTable extends MyFilteredSortedTable
         return _searchBox
     }
 
-    static _exportCSV(tableHead, tableRows) {
+    static _exportCSV(tableHead, tableRows)
+    /**
+     * Creates data to export to csv file
+     * @param tableHead - thead element of the table
+     * @param tableRows - tbody element of the table
+     * @private
+     */
+    {
         let bodyCSV = "";
         let bodyTableArray = [];
         let headTableArray = [];
@@ -641,7 +734,6 @@ class PagedTable extends MyFilteredSortedTable
      * @private
      */
     {
-
         if (cur === 0) {
             return []
         }
@@ -675,7 +767,22 @@ class PagedTable extends MyFilteredSortedTable
         return pages_to_show_array
     }
 
-    static _createPaginator(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types) {
+    static _createPaginator(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types)
+    /**
+     * Creates paginator element (actually collection of several elements) which allows to choose page to see
+     * Pay attention that several _createElementName functions in the Class have the same args list, it is done
+     * because these elements recreate themselves and sometimes other elements of the table.
+     * @param table_headings - array of column names
+     * @param div_id - container for the table
+     * @param rows_data - array of arrays, inner arrays length should be equal to table headings length
+     * @param cur_page - current active page of the table number
+     * @param items_page - how many rows per page to display
+     * @param table_styles - instace of TableStyle
+     * @param column_types - array which contains types of columns data, array length equal to table_headings length
+     * @returns {(HTMLButtonElement|HTMLDivElement)[]}
+     * @private
+     */
+    {
         let container = document.getElementById(div_id);
         let table = container.getElementsByTagName("table").item(0);
         const totalPageNumber = Math.ceil(rows_data.length/items_page);
@@ -804,8 +911,20 @@ class PagedTable extends MyFilteredSortedTable
     }
 
     static _createTableHead(table_headings, div_id, rows_data, cur_page, items_page, table_styles, column_types)
-    /** Table Head is created separately for PagedTable, since it acts independently from Table Body
-     * and do not change so ofter due to events in other table elements, like SearchBox and Paginator */
+    /**
+     * Creates headings part of the table.
+     * Pay attention that several _createElementName functions in the Class have the same args list, it is done
+     * because these elements recreate themselves and sometimes other elements of the table.
+     * @param table_headings - array of column names
+     * @param div_id - container for the table
+     * @param rows_data - array of arrays, inner arrays length should be equal to table headings length
+     * @param cur_page - current active page of the table number
+     * @param items_page - how many rows per page to display
+     * @param table_styles - instace of TableStyle
+     * @param column_types - array which contains types of columns data, array length equal to table_headings length
+     * @returns {(HTMLButtonElement|HTMLDivElement)[]}
+     * @private
+     */
     {
         let container = document.getElementById(div_id);
         let tableHead = document.createElement("thead");
@@ -839,7 +958,17 @@ class PagedTable extends MyFilteredSortedTable
         return tableHead
     }
 
-    static _createTableBody(rows_data, cur_page, items_page, table_styles) {
+    static _createTableBody(rows_data, cur_page, items_page, table_styles)
+    /**
+     * Creates body part for the table
+     * @param rows_data - array of arrays, inner arrays length should be equal to table headings length
+     * @param cur_page - current active page of the table number
+     * @param items_page - how many rows per page to display
+     * @param table_styles - instace of TableStyle
+     * @returns {HTMLTableSectionElement}
+     * @private
+     */
+    {
         let tableBody = document.createElement("tbody");
         tableBody.setAttribute("class", String(table_styles.tbody));
 
@@ -861,7 +990,19 @@ class PagedTable extends MyFilteredSortedTable
         return tableBody
     }
 
-    static _createInitialTable(_table_headings, div_id, _rows_data, table_styles, column_types, items_page) {
+    static _createInitialTable(_table_headings, div_id, _rows_data, table_styles, column_types, items_page)
+    /**
+     * Creates initial table state before any user actions
+     * @param _table_headings - array of column names
+     * @param div_id - container for the table
+     * @param _rows_data - array of arrays, inner arrays length should be equal to table headings length
+     * @param table_styles - instace of TableStyle
+     * @param column_types - array which contains types of columns data, array length equal to table_headings length
+     * @param items_page - how many rows per page to display
+     * @returns {HTMLTableElement}
+     * @private
+     */
+    {
         let myTable = document.createElement("table");
         myTable.setAttribute("class", String(table_styles.table));
         let cur_page = 0;
@@ -879,7 +1020,11 @@ class PagedTable extends MyFilteredSortedTable
         return myTable
     }
 
-    createPetTable() {
+    createPetTable()
+    /**
+     * Adds our table to the desired div container
+     */
+    {
         let divContainer = document.getElementById(this.div_id);
         let table = divContainer.getElementsByTagName("table").item(0);
         divContainer.innerText = "";
@@ -973,7 +1118,14 @@ class PagedUpdTable extends PagedTable
         } else {};  // do nothing = pass
     }
 
-    static _createStopUpdBtn(table_styles) {
+    static _createStopUpdBtn(table_styles)
+    /**
+     * creates button which can switch on/off updates
+     * @param table_styles - instance of TableStyle class
+     * @returns {HTMLButtonElement}
+     * @private
+     */
+    {
         let btn = document.createElement("button");
         btn.setAttribute("do_updates", "1");
         btn.innerText = "Не Обновлять";
@@ -999,13 +1151,24 @@ class PagedUpdTable extends PagedTable
         e.preventDefault();
     }
 
-    static _checkConstructorInputDataPagedUpd(url, update_interval) {
+    static _checkConstructorInputDataPagedUpd(url, update_interval)
+    /**
+     * Check user input variable before creating the table class instance
+     * @param url - to get updates from the certain API endpoint
+     * @param update_interval - number of seconds between updates - positive integer
+     * @private
+     */
+    {
         if (typeof update_interval !== "number") {throw new Error("update_interval should be number")};
         if (update_interval <= 0) {throw new Error("update_interval should be number")};
         if (typeof url !== "string") {throw new Error("update_interval should be number")};
     }
 
-    createPetTable() {
+    createPetTable()
+    /**
+     * Adds our table to the desired div container
+     */
+    {
         let divContainer = document.getElementById(this.div_id);
         let table = divContainer.getElementsByTagName("table").item(0);
         divContainer.innerText = "";
