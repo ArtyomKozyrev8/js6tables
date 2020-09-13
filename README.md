@@ -18,7 +18,9 @@ like you see in many tutorials;
 
 4. Pure JavaScript ECMA 6 for the tables, Bootsrap 4 is used to define some elements of Paginated Tables;
 
-5. Open Source - fork the repository and create your own tables based on the existent code.
+5. Open Source - fork the repository and create your own tables based on the existent code;
+
+6. All features were successfully tested in latest versions of Firefox, Edge, Chrome, Opera.
 
 **Dependencies:**
 
@@ -50,9 +52,19 @@ of another button.
 Steps to use MyPetTables:
 
 1. create html file;
-2. export mypettables.file to the html file;
+
+2. export mypettables.file to the html file, in example it is exported as module in head tag:
+`<script type="module" src="some_source"></script>`
+
 3. create div with id where mypettables table should be created;
-4. create separate js file or do the following in the bottom of body tag of html page inside script tag:
+
+4. create separate js file or do the following in the bottom of body tag of html page inside script tag, at the start of
+the file import classes from mypetatables.js:
+`<script type="module">`
+`import { TableStyle, MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable }`
+
+Note that you can still organise your code without import/export and type="module" way.
+
 
 4.1 create TableStyle instance to define style for your table (the same for any of 4 table types):
 
@@ -126,7 +138,7 @@ Loader should be defines only for  MyFilteredSortedTable and MyFilterSortUpdTabl
 
 4.5 If you use updatable table type, you should define backend API endpoint url
 
-    upd_url = "/get_updates";
+    let upd_url = "/get_updates";
 
 
 4.6 create table instance

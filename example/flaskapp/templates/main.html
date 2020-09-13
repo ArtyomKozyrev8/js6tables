@@ -41,7 +41,7 @@
     <!-- End of block -->
 
     <!-- mypettables Script should be imported after Bootstrap 4 scripts -->
-    <script src="{{ url_for('static', filename='mypettables_local.js')}}"></script>
+    <script type="module" src="{{ url_for('static', filename='mypettables_local.js')}}"></script>
 </head>
 <body>
     <h3>Ordinary Table</h3>
@@ -57,7 +57,9 @@
      or it can be defined as a separate js script file and then it can be declared in head block, NOTE it should be
      declared after mypettables.js
      -->
-    <script>
+    <script type="module">
+        import { TableStyle, MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable }
+        from "./static/mypettables_local.js";
         const tableStyles = new TableStyle("form-control", "btn btn-outline-success",
             "btn btn-outline-success", "table table-hover", "" , "", "loader") // this a classes names for elements
         // create first table:

@@ -1187,3 +1187,5 @@ class PagedUpdTable extends PagedTable
         divContainer.appendChild(this.pagination);
     }
 }
+
+export { TableStyle, MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable }
