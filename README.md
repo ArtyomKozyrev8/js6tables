@@ -1,19 +1,28 @@
 # my_pet_tables
-This is the collection of my own JavaScript ECMA 6 tables and examples how to combine them with Python Flask application. Inspired by Google Charts library.
+This is the collection of JavaScript ECMA 6 tables and examples how to combine them with Python Flask application.
+Inspired by Google Charts library and DataTables.
 
-Primarly I work with Flask + Jinja2. Jinja2 is a perfect server side page-rendering library, but if you would like to provide interactivity to page you always need Javascript. There are a great number of free and paid JavaScript Table Libraries, but in the repository I tried to create Tables which will use new JavaScripts ECMA6 Class paradigm, and to provide users with full control of library code with wide range of comments how each blcok of the code is used. 
+In general I work with Flask + Jinja2. Jinja2 is a perfect server side page-rendering library, but if you would like to
+provide interactivity to page you always need Javascript. There are a great number of free and paid JavaScript
+table libraries, but in the repository I tried to create tables which will use new JavaScripts ECMA6 Class paradigm
+and to provide users with full control of library code with wide range of comments how each block of the code is used. 
 
 **Features:**
 
-1. Really reusable OOP JavaScript ECMA 6 code - no copy paste in each of your js file or html page, like you see in many tutorials;
+1. Really reusable OOP JavaScript ECMA 6 code - no copy paste in each of your js file or html page,
+like you see in many tutorials;
 
 2. You can define any style for your tables, but functionality will stay the same;
 
 3. Code style is based on PEP and will be understandable for Python Developers;
 
-4. No Frameworks is used, just JavaScript ECMA 6;
+4. Pure JavaScript ECMA 6 for the tables, Bootsrap 4 is used to define some elements of Paginated Tables;
 
 5. Open Source - fork the repository and create your own tables based on the existent code.
+
+**Dependencies:**
+
+1. Bootstrap 4 if you want to use Paginated version of the Tables.
 
 **Contributation to the Project:**
 
@@ -21,5 +30,187 @@ Primarly I work with Flask + Jinja2. Jinja2 is a perfect server side page-render
 
 2. Feel free to contribute in documentation;
 
-3. Feel free to contribute in Flask example;
+3. Feel free to contribute in Flask based backend API example;
 
+**How to use**
+
+You can find complete example in the folder "example" of this repository, it is complete workthrough on how to use
+all the four tables types and combine them  with Python Flask API functions.
+Also it is absolutely possible to use the tables with any other backend Python (any other language) framework
+or, if you do not need periodic updates of your tables, without any backend.
+
+There are 4 table types: MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable. And one support
+class TableStyle which is used to define styles of you tables. First tow types are fine for small tables, e.g up to 
+300 rows tables, two other types are well suited for big table 1000+ rows of data. All tables have searchbox, which
+helps to find rows with a certain data; columns are sortable; download in CSV button. Updatable tables (get regular
+updates from your backend API endpoint) has button to stop or start updates, note if you used seachbox,
+you have stoped regular updates, clear searchbox to renew them; you can also choose rows per page number with the help
+of another button.
+
+Steps to use MyPetTables:
+
+1. create html file;
+2. export mypettables.file to the html file;
+3. create div with id where mypettables table should be created;
+4. create separate js file or do the following in the bottom of body tag of html page inside script tag:
+
+4.1 create TableStyle instance to define style for your table (the same for any of 4 table types):
+
+    let tableStyles = new TableStyle(
+
+        "form-control", // - searchbox style (input hml element) - css class name
+    
+        "btn btn-outline-success", // download table as a csv button style - css class name
+    
+        "btn btn-outline-success", // stop/starts table updates button style - css class name
+    
+        "table table-hover", // style for table element - css class name
+    
+        "", // table tbody style - css class name
+    
+        "", // table thead style - css class name
+    
+        "loader" // - spinner style - css class name
+   
+    );
+
+
+If you do not want to use any style for component - put empty "".
+Loader should be defines only for  MyFilteredSortedTable and MyFilterSortUpdTable - otherwise keep ""
+
+4.2 define table headers data (for any table type)
+
+
+    let t_headings = [
+
+        "Col Name One",
+    
+        "Col Name Two",
+    
+        "Col name Three"
+    
+    ];
+
+
+4.3  define table body data (for any table type). Note that inner arrays should have the same length as head arrays!
+
+
+    let data = [
+
+        ["Sam", 10, 200],
+    
+        ["Sara", 100, 51],
+    
+        ["Ivan", 25, 40],
+    
+        ["Alex", 40, 50],
+    
+        ["John", 64, 70]
+    
+    ];
+
+
+4.4 define datatypes for table columns. Note that it should have the same length as tabel headings array!
+
+
+    let t_types = [
+
+        "str", // string
+     
+        "num", // number type
+    
+        "num" // number type
+    
+    ];
+
+
+4.5 If you use updatable table type, you should define backend API endpoint url
+
+    upd_url = "/get_updates";
+
+
+4.6 create table instance
+
+4.6.a for MyFilteredSortedTable
+
+    let t = new MyFilteredSortedTable(
+    
+        "div_id_name", // div where we would like to see our table
+        
+        t_headings, // column headings Array
+        
+        data, // Array of Arrays, inner Array should have the same length as t_headings
+        
+        t_types, // types of columns data (number or string)
+        
+        true, // do we want to clear div before inserting table
+        
+        tableStyles
+        
+    );
+    
+4.6.b for MyFilterSortUpdTable
+
+    let t = new MyFilterSortUpdTable(
+    
+        "upd_ord_table", // div where we would like to see our table
+        
+        t_headings, // column headings Array
+        
+        data, // Array of Arrays, inner Array should have the same length as t_headings
+        
+        t_types, // types of columns data (number or string)
+        
+        upd_url, // endpoint of our API to get updates for our table
+        
+        15, // we would like to get updates every 15 seconds
+        
+        true, // do we want to clear div before inserting table
+        
+        tableStyles
+        
+    );
+    
+4.6.c for PagedTable
+
+    let t = new PagedTable(
+        
+        "page_table", // div where we would like to see our table
+        
+        t_headings, // column headings Array
+        
+        data, // Array of Arrays, inner Array should have the same length as t_headings
+        
+        t_types, // types of columns data (number or string)
+        
+        tableStyles
+    
+    );
+    
+4.6.d for PagedUpdTable
+
+    let t = new PagedUpdTable(
+        
+        "upd_page_table", // div where we would like to see our table
+        
+        t_headings, // column headings Array
+        
+        data, // Array of Arrays, inner Array should have the same length as t_headings
+        
+        t_types, // types of columns data (number or string)
+        
+        'upd_url, // url to get updates
+        
+        5, // updates interval every 5 seconds
+        
+        tableStyles
+    
+    );
+                
+                
+4.7 Add table to the webpage:
+
+    t.createPetTable();
+
+
+**You are done, thank you for using MyPetTables! Also check tutorial in example folder !**
