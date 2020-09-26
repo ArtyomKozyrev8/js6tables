@@ -584,7 +584,7 @@ class PagedTable extends MyFilteredSortedTable
         let btn = document.createElement("button");
         btn.setAttribute("class", "btn btn-outline-success dropdown-toggle");
         btn.setAttribute("data-toggle", "dropdown");
-        btn.setAttribute("items_per_page", String(items_page));
+        btn.setAttribute("data-items-per-page", String(items_page));
         btn.innerText = `Элементов: ${items_page}`;
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "3px";
@@ -606,7 +606,7 @@ class PagedTable extends MyFilteredSortedTable
                 if (activeTableRows.length === 0) { cur_page = 0 }
 
                 items_page = Number(e.target.innerText);
-                btn.setAttribute("items_per_page", e.target.innerText)
+                btn.setAttribute("data-items-per-page", e.target.innerText)
                 tableBody = PagedTable._createTableBody(activeTableRows, cur_page, items_page, table_styles);
                 tableHead = PagedTable._createTableHead(table_headings, div_id, rows_data, cur_page,
                     items_page, table_styles, column_types);
@@ -679,7 +679,7 @@ class PagedTable extends MyFilteredSortedTable
             let cur_page = 1;
             if (activeTableRows.length === 0) { cur_page = 0}
             let items_page = Number(container.getElementsByTagName("button").item(
-                1).getAttribute("items_per_page"));
+                1).getAttribute("data-items-per-page"));
             tableBody = PagedTable._createTableBody(activeTableRows, cur_page, items_page, table_styles);
             table.removeChild(table.lastChild);
             table.appendChild(tableBody);
@@ -1087,7 +1087,7 @@ class PagedUpdTable extends PagedTable
         let itemNumberBtn = container.getElementsByTagName("button").item(1);
         let searchBox = container.getElementsByTagName("input").item(0);
         if (searchBox.value === "" && updBtn.getAttribute("do_updates") === "1") {
-            let items_page = itemNumberBtn.getAttribute("items_per_page");
+            let items_page = itemNumberBtn.getAttribute("data-items-per-page");
             if (items_page) {
                 items_page = Number(items_page);
             } else {
