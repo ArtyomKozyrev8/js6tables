@@ -118,7 +118,7 @@ class MyFilteredSortedTable {
         let _searchBox = document.createElement("input");
         _searchBox.setAttribute("class", String(table_styles.searchbox));
         _searchBox.style.marginBottom = "3px";
-        _searchBox.setAttribute("placeholder", "Пожалуйста введите часть слова, которое ищете ...");
+        _searchBox.setAttribute("placeholder", "Please enter part of the word, you are searching for ...");
         return _searchBox
     }
 
@@ -417,7 +417,7 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
     {
         let btn = document.createElement("button");
         btn.setAttribute("do_updates", "1");
-        btn.innerText = "Не Обновлять";
+        btn.innerText = "Updates Off";
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "5px";
         btn.setAttribute("class", String(table_styles.updatesbtn));
@@ -431,10 +431,10 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
     {
         if (e.target.getAttribute("do_updates") === "0") {
             e.target.setAttribute("do_updates", "1");
-            e.target.innerText = "Не Обновлять";
+            e.target.innerText = "Updates Off";
         } else {
             e.target.setAttribute("do_updates", "0");
-            e.target.innerText = "Обновлять";
+            e.target.innerText = "Updates On";
         }
         e.preventDefault();
     }
@@ -585,7 +585,7 @@ class PagedTable extends MyFilteredSortedTable
         btn.setAttribute("class", "btn btn-outline-success dropdown-toggle");
         btn.setAttribute("data-toggle", "dropdown");
         btn.setAttribute("data-items-per-page", String(items_page));
-        btn.innerText = `Элементов: ${items_page}`;
+        btn.innerText = `Elements: ${items_page}`;
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "3px";
         let dropDownMenuContainer = document.createElement("div");
@@ -629,7 +629,7 @@ class PagedTable extends MyFilteredSortedTable
                 container.appendChild(navItem);
 
                 let chooseElementNumberBtn = container.getElementsByTagName("button").item(1);
-                chooseElementNumberBtn.innerText = `Элементов: ${e.target.innerText}`
+                chooseElementNumberBtn.innerText = `Elements: ${e.target.innerText}`
             })
             dropDownMenuContainer.appendChild(_link);
         }
@@ -657,7 +657,7 @@ class PagedTable extends MyFilteredSortedTable
         let _searchBox = document.createElement("input");
         _searchBox.setAttribute("class", String(table_styles.searchbox));
         _searchBox.style.marginBottom = "3px";
-        _searchBox.setAttribute("placeholder", "Пожалуйста введите часть слова, которое ищете ...");
+        _searchBox.setAttribute("placeholder", "Please enter part of the word, you are searching for ...");
         let tableBody = table.getElementsByTagName("tbody").item(0);
 
         _searchBox.addEventListener("keyup", (e) => {
@@ -796,7 +796,7 @@ class PagedTable extends MyFilteredSortedTable
         // crete Previous button in paginator
         let listItemPrev = document.createElement("li");
         let last_link = document.createElement("a");
-        last_link.innerText = "Назад";
+        last_link.innerText = "Prev";
         last_link.setAttribute("href", "#" + div_id);
         last_link.setAttribute("class", "page-link");
 
@@ -853,7 +853,7 @@ class PagedTable extends MyFilteredSortedTable
         // create Next Button
         let listItemNext = document.createElement("li");
         let next_link = document.createElement("a");
-        next_link.innerText = "Далее";
+        next_link.innerText = "Next";
         next_link.setAttribute("href", "#" + div_id);
         next_link.setAttribute("class", "page-link");
 
@@ -1128,7 +1128,7 @@ class PagedUpdTable extends PagedTable
     {
         let btn = document.createElement("button");
         btn.setAttribute("do_updates", "1");
-        btn.innerText = "Не Обновлять";
+        btn.innerText = "Updates Off";
         btn.style.marginBottom = "3px";
         btn.style.marginLeft = "5px";
         btn.style.marginRight = "5px";
@@ -1143,10 +1143,10 @@ class PagedUpdTable extends PagedTable
     {
         if (e.target.getAttribute("do_updates") === "0") {
             e.target.setAttribute("do_updates", "1");
-            e.target.innerText = "Не Обновлять";
+            e.target.innerText = "Updates Off";
         } else {
             e.target.setAttribute("do_updates", "0");
-            e.target.innerText = "Обновлять";
+            e.target.innerText = "Updates On";
         }
         e.preventDefault();
     }
