@@ -582,7 +582,7 @@ class PagedTable extends MyFilteredSortedTable
         let container = document.getElementById(div_id);
         let table = container.getElementsByTagName("table").item(0);
         let btn = document.createElement("button");
-        btn.setAttribute("class", "btn btn-outline-success dropdown-toggle");
+        btn.setAttribute("class", "dropdown-toggle" + " " + table_styles.csvbtn);
         btn.setAttribute("data-toggle", "dropdown");
         btn.setAttribute("data-items-per-page", String(items_page));
         btn.innerText = `Elements: ${items_page}`;
