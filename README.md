@@ -8,14 +8,22 @@ js6tables is the choice for you if you would like to have out of the box solutio
 but also want to have opportunity to add your own features to existent code working with modern JavasScript
 version ECMA6.
 
-The project is inspired by Google Charts library and DataTables.
+The project is inspired by Google Charts library and DataTables. The repo contains complete example how to use
+js6tables with Python Flask Backend.
 
-In general I work with Flask + Jinja2. Jinja2 is a perfect server side page-rendering library, but if you would like to
-provide interactivity to page you always need Javascript. There are a great number of free and paid JavaScript
-table libraries, but in the repository I tried to create tables which will use new JavaScripts ECMA6 Class paradigm
-and to provide users with full control of library code with wide range of comments how each block of the code is used. 
+**Four Table Types To Choose: BasicTable, BasicUpdTable, PagedTable, PagedUpdTable**
 
-The project is also accompanied by complete example how to use js6tables with Python Flask Backend.
+**BasicTable**
+![Ordinary Table](images/ord_table.png)
+
+**BasicUpdTable**
+![Ordinary Table](images/ord_upd_table.png)
+
+**PagedTable**
+![Ordinary Table](images/paginated_table.png)
+
+**PagedUpdTable**
+![Ordinary Table](images/paginated_upd_table.png)
 
 **Features:**
 
