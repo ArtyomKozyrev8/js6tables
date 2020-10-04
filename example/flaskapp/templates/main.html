@@ -40,8 +40,8 @@
     </style>
     <!-- End of block -->
 
-    <!-- mypettables Script should be imported after Bootstrap 4 scripts -->
-    <script type="module" src="{{ url_for('static', filename='mypettables_local.js')}}"></script>
+    <!-- js6tables Script should be imported after Bootstrap 4 scripts -->
+    <script type="module" src="{{ url_for('static', filename='js6tables.js')}}"></script>
 </head>
 <body>
     <h3>Ordinary Table</h3>
@@ -53,13 +53,13 @@
     <h3>Updatable Paginated Table</h3>
     <div id="upd_page_table"></div>
 
-    <!-- Script which create tables with the help of classed from mypettables can be defined in the end of body container
+    <!-- Script which create tables with the help of classed from js6tables can be defined in the end of body container
      or it can be defined as a separate js script file and then it can be declared in head block, NOTE it should be
-     declared after mypettables.js
+     declared after js6tables.js
      -->
     <script type="module">
-        import { TableStyle, MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable }
-        from "./static/mypettables_local.js";
+        import { TableStyle, BasicTable, BasicUpdTable, PagedTable, PagedUpdTable }
+        from "./static/js6tables.js";
         const tableStyles = new TableStyle("form-control", "btn btn-outline-success",
             "btn btn-outline-success", "table table-hover", "" , "", "loader") // this a classes names for elements
         // create first table:
@@ -68,7 +68,7 @@
             .then(data => {
                 let t_headings = ["A", "B", "C", "D", "E", "F"];
                 let t_types = new Array(t_headings.length).fill("num"); // num or str
-                let t = new MyFilteredSortedTable(
+                let t = new BasicTable(
                     "ord_table", // div where we would like to see our table
                     t_headings, // column headings Array
                     data, // Array of Arrays, inner Array should have the same length as t_headings
@@ -76,7 +76,7 @@
                     true, // do we want to clear div before inserting table
                     tableStyles
                 );
-                t.createPetTable();
+                t.createTheTable();
             });
         // create second table
         fetch('/random/9/7')
@@ -84,7 +84,7 @@
             .then(data => {
                 let t_headings = ["A", "B", "C", "D", "E", "F", "G"];
                 let t_types = new Array(t_headings.length).fill("num");
-                let t = new MyFilterSortUpdTable(
+                let t = new BasicUpdTable(
                     "upd_ord_table", // div where we would like to see our table
                     t_headings, // column headings Array
                     data, // Array of Arrays, inner Array should have the same length as t_headings
@@ -94,7 +94,7 @@
                     true, // do we want to clear div before inserting table
                     tableStyles
                 );
-                t.createPetTable();
+                t.createTheTable();
             });
         // create third table
         fetch('/paged/75/5')
@@ -109,7 +109,7 @@
                     t_types, // types of columns data (number or string)
                     tableStyles
                 );
-                t.createPetTable();
+                t.createTheTable();
             });
         // create fourth table
         fetch('/paged_upd/75/5')
@@ -126,7 +126,7 @@
                     5, // updates interval in seconds
                     tableStyles
                 );
-                t.createPetTable();
+                t.createTheTable();
             });
 
     </script>
