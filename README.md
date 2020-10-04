@@ -232,7 +232,7 @@ Loader should be defines only for  BasicTable and BasicUpdTable - otherwise keep
                 
 4.7 Add table to the webpage:
 
-    t.createJSixTable();
+    t.createTheTable();
 
 
 **You are done, thank you for using js6tables! Also check tutorial in example folder !**
