@@ -1,6 +1,12 @@
 # js6tables
 
-js6tables is the collection of JavaScript ECMA 6 tables with easy to customize style, the tables have the majority of desired features like pagination, sortable columns, searchbox, download table in csv format option, rows per page selector, periodic updates of table data.
+js6tables is the collection of JavaScript ECMA 6 tables with easy to customize style, the tables have the majority
+of desired features like pagination, sortable columns, searchbox, download table in csv format option, rows per page
+selector, periodic updates of table data.
+
+js6tables is the choice for you if you would like to have out of the box solution with customizable style,
+but also want to have opportunity to add your own features to existent code working with modern JavasScript
+version ECMA6.
 
 The project is inspired by Google Charts library and DataTables.
 
@@ -45,27 +51,27 @@ all the four tables types and combine them  with Python Flask API functions.
 Also it is absolutely possible to use the tables with any other backend Python (any other language) framework
 or, if you do not need periodic updates of your tables, without any backend.
 
-There are 4 table types: MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable. And one support
+There are 4 table types: BasicTable, BasicUpdTable, PagedTable, PagedUpdTable. And one support
 class TableStyle which is used to define styles of you tables. First two types are fine for small tables, e.g up to 
-300 rows tables, two other types are well suited for big table 1000+ (was tested even with 50 000 rows) rows of data. All tables have searchbox, which
-helps to find rows with a certain data; columns are sortable; download in CSV button. Updatable tables (get regular
-updates from your backend API endpoint) has button to stop or start updates, note if you used seachbox,
-you have stoped regular updates, clear searchbox to renew them; you can also choose rows per page number with the help
-of another button.
+300 rows tables, two other types are well suited for big table 1000+ (was tested even with 50 000 rows) rows of data.
+All tables have searchbox, which helps to find rows with a certain data; columns are sortable; download in CSV button.
+Updatable tables (get regular updates from your backend API endpoint) has button to stop or start updates,
+note if you used seachbox, you have stoped regular updates, clear searchbox to renew them; you can also choose rows
+per page number with the help of another selector button.
 
-Steps to use MyPetTables:
+Steps to use js6tables:
 
 1. create html file;
 
-2. export mypettables.file to the html file, in example it is exported as module in head tag:
+2. export js6tables.file to the html file, in example it is exported as module in head tag:
 `<script type="module" src="some_source"></script>`
 
-3. create div with id where mypettables table should be created;
+3. create div with id where js6tables table should be created;
 
 4. create separate js file or do the following in the bottom of body tag of html page inside script tag, at the start of
-the file import classes from mypetatables.js:
+the file import classes from js6tables.js:
 `<script type="module">`
-`import { TableStyle, MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable }`
+`import { TableStyle, BasicTable, BasicUpdTable, PagedTable, PagedUpdTable }`
 
 Note that you can still organise your code without import/export and type="module" way.
 
@@ -92,7 +98,7 @@ Note that you can still organise your code without import/export and type="modul
 
 
 If you do not want to use any style for component - put empty "".
-Loader should be defines only for  MyFilteredSortedTable and MyFilterSortUpdTable - otherwise keep ""
+Loader should be defines only for  BasicTable and BasicUpdTable - otherwise keep ""
 
 4.2 define table headers data (for any table type)
 
@@ -147,9 +153,9 @@ Loader should be defines only for  MyFilteredSortedTable and MyFilterSortUpdTabl
 
 4.6 create table instance
 
-4.6.a for MyFilteredSortedTable
+4.6.a for BasicTable
 
-    let t = new MyFilteredSortedTable(
+    let t = new BasicTable(
     
         "div_id_name", // div where we would like to see our table
         
@@ -165,9 +171,9 @@ Loader should be defines only for  MyFilteredSortedTable and MyFilterSortUpdTabl
         
     );
     
-4.6.b for MyFilterSortUpdTable
+4.6.b for BasicUpdTable
 
-    let t = new MyFilterSortUpdTable(
+    let t = new BasicUpdTable(
     
         "upd_ord_table", // div where we would like to see our table
         
@@ -226,7 +232,7 @@ Loader should be defines only for  MyFilteredSortedTable and MyFilterSortUpdTabl
                 
 4.7 Add table to the webpage:
 
-    t.createPetTable();
+    t.createJSixTable();
 
 
-**You are done, thank you for using MyPetTables! Also check tutorial in example folder !**
+**You are done, thank you for using js6tables! Also check tutorial in example folder !**
