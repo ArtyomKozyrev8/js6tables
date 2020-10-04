@@ -1,11 +1,15 @@
-# my_pet_tables
-This is the collection of JavaScript ECMA 6 tables and examples how to combine them with Python Flask application.
-Inspired by Google Charts library and DataTables.
+# js6tables
+
+js6tables is the collection of JavaScript ECMA 6 tables with easy to customize style, the tables have the majority of desired features like pagination, sortable columns, searchbox, download table in csv format option, rows per page selector, periodic updates of table data.
+
+The project is inspired by Google Charts library and DataTables.
 
 In general I work with Flask + Jinja2. Jinja2 is a perfect server side page-rendering library, but if you would like to
 provide interactivity to page you always need Javascript. There are a great number of free and paid JavaScript
 table libraries, but in the repository I tried to create tables which will use new JavaScripts ECMA6 Class paradigm
 and to provide users with full control of library code with wide range of comments how each block of the code is used. 
+
+The project is also accompanied by complete example how to use js6tables with Python Flask Backend.
 
 **Features:**
 
@@ -42,8 +46,8 @@ Also it is absolutely possible to use the tables with any other backend Python (
 or, if you do not need periodic updates of your tables, without any backend.
 
 There are 4 table types: MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable. And one support
-class TableStyle which is used to define styles of you tables. First tow types are fine for small tables, e.g up to 
-300 rows tables, two other types are well suited for big table 1000+ rows of data. All tables have searchbox, which
+class TableStyle which is used to define styles of you tables. First two types are fine for small tables, e.g up to 
+300 rows tables, two other types are well suited for big table 1000+ (was tested even with 50 000 rows) rows of data. All tables have searchbox, which
 helps to find rows with a certain data; columns are sortable; download in CSV button. Updatable tables (get regular
 updates from your backend API endpoint) has button to stop or start updates, note if you used seachbox,
 you have stoped regular updates, clear searchbox to renew them; you can also choose rows per page number with the help
