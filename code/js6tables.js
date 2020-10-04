@@ -23,7 +23,7 @@ class TableStyle {
 }
 
 
-class MyFilteredSortedTable {
+class BasicTable {
     constructor(div_id, table_headings, rows_data, column_types, clear_div= true,
                 table_styles = new TableStyle())
     /**
@@ -40,17 +40,17 @@ class MyFilteredSortedTable {
      */
 
     {
-        MyFilteredSortedTable._checkConstructorInputData(table_headings, rows_data, column_types,
+        BasicTable._checkConstructorInputData(table_headings, rows_data, column_types,
             table_styles, clear_div);
         this.div_id = div_id;
         this.table_headings = table_headings;
         this.rows_data = rows_data;
         this.clear_div = clear_div;
         this.table_styles = table_styles;
-        this.searchBox = MyFilteredSortedTable._createSearchBox(this.table_styles);
-        this.btnCSV = MyFilteredSortedTable._createDownloadCSVBtn(this.table_styles);
-        this.loadSpinner = MyFilteredSortedTable._createSpinner(this.table_styles);
-        this.myTable = MyFilteredSortedTable._createTable(this.table_headings, this.rows_data, this.table_styles);
+        this.searchBox = BasicTable._createSearchBox(this.table_styles);
+        this.btnCSV = BasicTable._createDownloadCSVBtn(this.table_styles);
+        this.loadSpinner = BasicTable._createSpinner(this.table_styles);
+        this.TheTable = BasicTable._createTable(this.table_headings, this.rows_data, this.table_styles);
         this.column_types = column_types;
     }
 
@@ -147,8 +147,8 @@ class MyFilteredSortedTable {
      * @private
      */
     {
-        let myTable = document.createElement("table");
-        myTable.setAttribute("class", String(table_styles.table));
+        let TheTable = document.createElement("table");
+        TheTable.setAttribute("class", String(table_styles.table));
 
         // create table head block
         let th_row = document.createElement("tr");
@@ -160,7 +160,7 @@ class MyFilteredSortedTable {
         let tableHead = document.createElement("thead");
         tableHead.setAttribute("class", String(table_styles.thead));
         tableHead.appendChild(th_row);
-        myTable.appendChild(tableHead);
+        TheTable.appendChild(tableHead);
 
         // create table body block
         let tableBody = document.createElement("tbody");
@@ -175,9 +175,9 @@ class MyFilteredSortedTable {
             }
             tableBody.appendChild(body_row);
         }
-        myTable.appendChild(tableBody);
+        TheTable.appendChild(tableBody);
 
-        return myTable
+        return TheTable
     }
 
     static _sortItemsFunc(index, _type, order, pure_array) {
@@ -231,34 +231,34 @@ class MyFilteredSortedTable {
              * sorts elements of Array and returns a new Array
              * array - some Array created from Table element
              */
-            let f = MyFilteredSortedTable._sortItemsFunc(index, _type, _order, pure_array);
+            let f = BasicTable._sortItemsFunc(index, _type, _order, pure_array);
             _order *= -1;
             return Array.from(array.sort((a, b) => f(a, b)))
         }
         return innerFunc
     }
 
-    static _sortTable(myTable, spinner, sortFunc)
+    static _sortTable(TheTable, spinner, sortFunc)
     /**
      * sorts Table based on sortFunc which includes column number and its column data type,
      * _sortTable is attached to each table column header
-     * @param myTable - table element inside the div where table was created
+     * @param TheTable - table element inside the div where table was created
      * @param spinner - spinner element inside the div where table was created
      * @param sortFunc - created a new Array which is composed of sorted Table rows
      * @private
      */
     {
-        let bodyRows = myTable.children[1].getElementsByTagName("tr");
+        let bodyRows = TheTable.children[1].getElementsByTagName("tr");
         let tempBodyRowsArray = Array.from(bodyRows);
         spinner.style.display = "";
-        myTable.children[1].style.display = "none";
+        TheTable.children[1].style.display = "none";
 
         // setTimeout is used in order to hide table body, does not work otherwise
         setTimeout(()=> {
             let data = sortFunc(tempBodyRowsArray);
-            for (let i = 0; i < data.length; i++) { myTable.children[1].appendChild(data[i]); }
+            for (let i = 0; i < data.length; i++) { TheTable.children[1].appendChild(data[i]); }
             spinner.style.display = "none";
-            myTable.children[1].style.display = "";
+            TheTable.children[1].style.display = "";
             this.sort_order = !this.sort_order;
         }, 100);
     }
@@ -298,7 +298,7 @@ class MyFilteredSortedTable {
         bodyCSV += bodyTableArray.join("\n");
 
         const tableHTMLURL = "data:text/csv/charset=UTF-8, " + encodeURIComponent(bodyCSV);
-        MyFilteredSortedTable._triggerDownload(tableHTMLURL, "table_utf8_encoding.csv");
+        BasicTable._triggerDownload(tableHTMLURL, "table_utf8_encoding.csv");
     }
 
     static _triggerDownload(url, filename)
@@ -343,7 +343,7 @@ class MyFilteredSortedTable {
         }
     }
 
-    createPetTable()
+    createTheTable()
     /**
      * creates all elements of the Table and put them inside the chosen div
      */
@@ -351,31 +351,31 @@ class MyFilteredSortedTable {
         let divContainer = document.getElementById(this.div_id);
         if (this.clear_div) {divContainer.innerText = "";};
 
-        let tableHead = this.myTable.children[0];
-        let tableBody = this.myTable.children[1];
+        let tableHead = this.TheTable.children[0];
+        let tableBody = this.TheTable.children[1];
 
         this.searchBox.addEventListener("keyup", () => {
-            MyFilteredSortedTable._filterTableBody(tableBody, this.searchBox);
+            BasicTable._filterTableBody(tableBody, this.searchBox);
         });
 
         // add event handler to column headers
         for (let index=0; index<tableHead.children[0].childElementCount; index++) {
-            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index], false);
+            let sortFunc = BasicTable._sortTableArray(index, this.column_types[index], false);
             tableHead.children[0].children[index].addEventListener("click", ()=>{
-                MyFilteredSortedTable._sortTable(this.myTable, this.loadSpinner, sortFunc);
+                BasicTable._sortTable(this.TheTable, this.loadSpinner, sortFunc);
             });
         }
 
-        this.btnCSV.addEventListener("click", () => { MyFilteredSortedTable._exportCSV(this.myTable); });
+        this.btnCSV.addEventListener("click", () => { BasicTable._exportCSV(this.TheTable); });
 
         divContainer.appendChild(this.btnCSV);
         divContainer.appendChild(this.searchBox);
-        divContainer.appendChild(this.myTable);
+        divContainer.appendChild(this.TheTable);
         divContainer.appendChild(this.loadSpinner);
     }
 }
 
-class MyFilterSortUpdTable extends MyFilteredSortedTable
+class BasicUpdTable extends BasicTable
 {
     constructor(div_id, table_headings, rows_data, column_types, url, update_interval=10,
                 clear_div = true, table_styles=new TableStyle())
@@ -393,15 +393,15 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
      * @param table_styles - TableStyle instance which contains table styles
      */
     {
-        MyFilterSortUpdTable._checkConstructorInputDataFilterSortUpd(url, update_interval);
+        BasicUpdTable._checkConstructorInputDataFilterSortUpd(url, update_interval);
         super(div_id, table_headings, rows_data, column_types, clear_div, table_styles);
         this.url = url;
         this.update_interval = update_interval;
         this.do_updates = true ; // flag whether table should be updated, the flag is attached to button
-        this.btnUpd = MyFilterSortUpdTable._createStopResUpdBtn(this.table_styles);
+        this.btnUpd = BasicUpdTable._createStopResUpdBtn(this.table_styles);
         // table body is recreated after each update. Searchbox is used as condition flag.
         setInterval(
-            () => { MyFilterSortUpdTable._updateTableBody(this.btnUpd, this.myTable,
+            () => { BasicUpdTable._updateTableBody(this.btnUpd, this.TheTable,
                 this.searchBox, this.loadSpinner, this.url) },
             this.update_interval * 1000
         );
@@ -488,7 +488,7 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
         } else {};  // do nothing = pass
     }
 
-    createPetTable()
+    createTheTable()
     /**
      * Adds our table to the desired div container
      */
@@ -496,34 +496,34 @@ class MyFilterSortUpdTable extends MyFilteredSortedTable
         let divContainer = document.getElementById(this.div_id);
         if (this.clear_div) {divContainer.innerText = "";};
 
-        let tableHead = this.myTable.children[0];
-        let tableBody = this.myTable.children[1];
+        let tableHead = this.TheTable.children[0];
+        let tableBody = this.TheTable.children[1];
 
         this.searchBox.addEventListener("keyup", () => {
-            MyFilterSortUpdTable._filterTableBody(tableBody, this.searchBox);
+            BasicUpdTable._filterTableBody(tableBody, this.searchBox);
         });
 
         // add event handler to column headers
         for (let index=0; index<tableHead.children[0].childElementCount; index++) {
-            let sortFunc = MyFilteredSortedTable._sortTableArray(index, this.column_types[index], false);
+            let sortFunc = BasicTable._sortTableArray(index, this.column_types[index], false);
             tableHead.children[0].children[index].addEventListener("click", ()=>{
-                MyFilteredSortedTable._sortTable(this.myTable, this.loadSpinner, sortFunc);
+                BasicTable._sortTable(this.TheTable, this.loadSpinner, sortFunc);
             });
         }
 
-        this.btnCSV.addEventListener("click", () => { MyFilterSortUpdTable._exportCSV(this.myTable); });
+        this.btnCSV.addEventListener("click", () => { BasicUpdTable._exportCSV(this.TheTable); });
         this.btnUpd.addEventListener("click", (e) => {
-            MyFilterSortUpdTable._stopPeriodicUpdates(e);
+            BasicUpdTable._stopPeriodicUpdates(e);
         });
         divContainer.appendChild(this.btnCSV);
         divContainer.appendChild(this.btnUpd); // new element here in comparison with Basic Table
         divContainer.appendChild(this.searchBox);
-        divContainer.appendChild(this.myTable);
+        divContainer.appendChild(this.TheTable);
         divContainer.appendChild(this.loadSpinner);
     }
 }
 
-class PagedTable extends MyFilteredSortedTable
+class PagedTable extends BasicTable
 {
     constructor(div_id, table_headings, rows_data, column_types, table_styles = new TableStyle())
     /**
@@ -720,7 +720,7 @@ class PagedTable extends MyFilteredSortedTable
         bodyCSV += bodyTableArray.join("\n");
 
         const tableHTMLURL = "data:text/csv/charset=UTF-8, " + encodeURIComponent(bodyCSV);
-        MyFilteredSortedTable._triggerDownload(tableHTMLURL, "table_utf8_encoding.csv");
+        BasicTable._triggerDownload(tableHTMLURL, "table_utf8_encoding.csv");
     }
 
     static _findVisiblePageNumbers(cur, page_to_show_num, total)
@@ -931,7 +931,7 @@ class PagedTable extends MyFilteredSortedTable
         tableHead.setAttribute("class", String(table_styles.thead));
         let th_row = document.createElement("tr");
         for (let i=0; i<table_headings.length; i++) {
-            let sortFunc = MyFilteredSortedTable._sortTableArray(i, column_types[i], true);
+            let sortFunc = BasicTable._sortTableArray(i, column_types[i], true);
             let element = document.createElement("th");
             element.innerHTML = table_headings[i] + " <b><span style='font-size: 22px;'>&#8593;&#8595;</span></b>";
             element.addEventListener("click", () => {
@@ -1003,24 +1003,24 @@ class PagedTable extends MyFilteredSortedTable
      * @private
      */
     {
-        let myTable = document.createElement("table");
-        myTable.setAttribute("class", String(table_styles.table));
+        let TheTable = document.createElement("table");
+        TheTable.setAttribute("class", String(table_styles.table));
         let cur_page = 0;
         if (_rows_data.length>0) {cur_page = 1};
 
         let tableHead = PagedTable._createTableHead(_table_headings, div_id, _rows_data,
             cur_page, items_page, table_styles, column_types);
-        myTable.appendChild(tableHead);
+        TheTable.appendChild(tableHead);
 
         let tableBody = PagedTable._createTableBody(_rows_data, cur_page, items_page, table_styles);
-        myTable.appendChild(tableBody);
+        TheTable.appendChild(tableBody);
         let container = document.getElementById(div_id);
 
-        container.appendChild(myTable);
-        return myTable
+        container.appendChild(TheTable);
+        return TheTable
     }
 
-    createPetTable()
+    createTheTable()
     /**
      * Adds our table to the desired div container
      */
@@ -1164,7 +1164,7 @@ class PagedUpdTable extends PagedTable
         if (typeof url !== "string") {throw new Error("update_interval should be number")};
     }
 
-    createPetTable()
+    createTheTable()
     /**
      * Adds our table to the desired div container
      */
@@ -1188,4 +1188,4 @@ class PagedUpdTable extends PagedTable
     }
 }
 
-export { TableStyle, MyFilteredSortedTable, MyFilterSortUpdTable, PagedTable, PagedUpdTable }
+export { TableStyle, BasicTable, BasicUpdTable, PagedTable, PagedUpdTable }
